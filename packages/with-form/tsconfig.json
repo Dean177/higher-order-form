@@ -19,6 +19,6 @@
   "exclude": [
     "dist",
     "node_modules",
-    "**/*.test.tsx?"
+    "**/*.test.tsx"
   ]
 }

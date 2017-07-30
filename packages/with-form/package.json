@@ -55,6 +55,8 @@
     }
   },
   "license": "MIT",
+  "main": "dist/withForm.js",
+  "types": "dist/withForm.d.ts",
   "scripts": {
     "build": "tsc",
     "build:dev": "tsc --noEmit --pretty --watch",

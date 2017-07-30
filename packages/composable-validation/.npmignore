@@ -1,5 +1,6 @@
 coverage
 Readme.md
 src
+tsconfig.json
 yarn.lock
 yarn-error.log
