@@ -35,7 +35,9 @@
     }
   },
   "license": "MIT",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "name": "composable-validation",
@@ -47,5 +49,5 @@
     "test:dev": "jest --watch",
     "prepublish": "npm run test && npm run build"
   },
-  "version": "0.0.1"
+  "version": "0.0.6"
 }

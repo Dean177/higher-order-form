@@ -1,7 +1,7 @@
 {
   "private": true,
   "dependencies": {
-    "composable-validation": "^0.0.1",
+    "composable-validation": "^0.0.6",
     "lodash": "4.17.4"
   },
   "devDependencies": {
@@ -46,5 +46,5 @@
   "scripts": {
     "test": "jest"
   },
-  "version": "0.0.1"
+  "version": "0.0.6"
 }

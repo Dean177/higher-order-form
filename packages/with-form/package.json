@@ -1,9 +1,9 @@
 {
   "author": "Dean Merchant",
   "name": "with-form",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "dependencies": {
-    "composable-validation": "^0.0.1",
+    "composable-validation": "^0.0.6",
     "lodash": "4.17.4"
   },
   "peerDependencies": {
@@ -55,7 +55,9 @@
     }
   },
   "license": "MIT",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "dist/withForm.js",
   "types": "dist/withForm.d.ts",
   "scripts": {
