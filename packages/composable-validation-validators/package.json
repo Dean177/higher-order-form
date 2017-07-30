@@ -1,12 +1,12 @@
 {
   "private": true,
   "dependencies": {
-    "composable-validation": "0.0.0",
+    "composable-validation": "^0.0.1",
     "lodash": "4.17.4"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.71",
     "@types/jest": "20.0.5",
+    "@types/lodash": "4.14.71",
     "jest": "20.0.4",
     "ts-jest": "20.0.7",
     "typescript": "2.4.2"
@@ -45,5 +45,6 @@
   "name": "composable-validation-validators",
   "scripts": {
     "test": "jest"
-  }
+  },
+  "version": "0.0.1"
 }
