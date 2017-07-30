@@ -55,6 +55,7 @@
     }
   },
   "license": "MIT",
+  "files": ["dist"],
   "main": "dist/withForm.js",
   "types": "dist/withForm.d.ts",
   "scripts": {
