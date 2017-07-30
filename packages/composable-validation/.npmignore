@@ -1,0 +1,5 @@
+coverage
+Readme.md
+src
+yarn.lock
+yarn-error.log

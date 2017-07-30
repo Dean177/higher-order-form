@@ -1,0 +1,49 @@
+{
+  "private": true,
+  "dependencies": {
+    "composable-validation": "0.0.0",
+    "lodash": "4.17.4"
+  },
+  "devDependencies": {
+    "@types/lodash": "4.14.71",
+    "@types/jest": "20.0.5",
+    "jest": "20.0.4",
+    "ts-jest": "20.0.7",
+    "typescript": "2.4.2"
+  },
+  "files": [
+    "dist"
+  ],
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/src/common-types.ts",
+      "<rootDir>/src/index.ts"
+    ],
+    "coverageReporters": [
+      "text"
+    ],
+    "mapCoverage": true,
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ],
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/src/**/?(*.)(spec|test).ts?(x)"
+    ],
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    }
+  },
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "name": "composable-validation-validators",
+  "scripts": {
+    "test": "jest"
+  }
+}
