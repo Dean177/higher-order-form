@@ -1,4 +1,4 @@
-import { assign, find, findKey, keys, last, mapValues, some } from 'lodash';
+import { assign, find, findKey, keys, last, mapValues, pickBy, some } from 'lodash';
 import {
   createElement,
   cloneElement,
@@ -104,9 +104,14 @@ export const withForm =
         }
 
         validationErrors = (): ValidationResult<FM> =>
-          mapValues(this.state.fieldMeta, (meta: FieldMeta): ValidationErrors =>
-            ((meta != null && meta.hasBlurred) ? (meta.errors) : noValidationErrors),
-          ) as TODO as ValidationResult<FM>
+          pickBy(
+            mapValues(
+              this.state.fieldMeta,
+              (meta: FieldMeta): ValidationErrors =>
+                ((meta != null && meta.hasBlurred) ? (meta.errors) : noValidationErrors),
+            ) as TODO as ValidationResult<FM>,
+            (errors) => errors && errors.length > 0
+          )
 
         ifValid = (callbackIfValid: (formModel: FM) => void): void => {
           const validationResult = validate(config.validator(this.state.values, this.props), this.state.values);
