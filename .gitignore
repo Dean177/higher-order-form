@@ -1,6 +1,7 @@
 .DS_Store
 .idea
 coverage
-node_modules
 dist
+lerna-debug
+node_modules
 yarn-error.log

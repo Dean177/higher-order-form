@@ -1,5 +1,5 @@
 import { endsWith, flatten, startsWith } from 'lodash';
-import { rules, validate, ValueValidator, Validator } from './validate';
+import { hasValidationErrors, rules, validate, ValueValidator, Validator } from './validate';
 
 export const maxLength = (max: number): ValueValidator<string | null> =>
   (value: string | null) => (value != null && value.length > max) ? [`Text must be less than ${max} characters`] : [];
@@ -30,11 +30,37 @@ describe('rules', () => {
 });
 
 describe('validate', () => {
-  it('returns an object whose keys represent', () => {
-    interface MyObject { name: string }
+  it('returns an object with key value pairs for values which fail validation', () => {
+    type MyObject = { name: string };
     const constraints: Validator<MyObject> = { name: rules(minLength(5), maxLength(10)) };
     const validationResult = (validate(constraints, { name: '' }) as any).name;
 
-    expect((validationResult && validationResult.length)).toBeGreaterThan(0);
+    expect(validationResult && validationResult.length).toBeGreaterThan(0);
+  });
+
+  it('returns an object which only has keys for values that have validation errors', () => {
+    type OtherObject = { name: string, validKey: number };
+    const constraints: Validator<OtherObject> = {
+      name: rules(minLength(5), maxLength(10)),
+      validKey: (number: number) => [],
+    };
+    const validationResult = (validate(constraints, { name: '', validKey: 6 }) as any);
+
+    expect(validationResult.name.length).toBeGreaterThan(0);
+    expect(validationResult.validKey).toBeUndefined();
+  })
+});
+
+describe('hasValidationErrors', () => {
+  it('returns true if the object any non-empty errors', () => {
+    expect(hasValidationErrors({ key: ['error'], otherKey: [] })).toBe(true);
+  });
+
+  it('returns false if the object has no keys', () => {
+    expect(hasValidationErrors({})).toBe(false);
+  });
+
+  it('returns false if all ValidationErrors are empty', () => {
+    expect(hasValidationErrors({ someKey: [] })).toBe(false);
   });
 });

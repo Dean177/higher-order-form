@@ -1,4 +1,4 @@
-import { flatMap, mapValues, some } from 'lodash';
+import { chain, flatMap, mapValues, pickBy, some } from 'lodash';
 
 export type ValidationErrors = Array<string>;
 export type ValueValidator<T> = (value: T) => ValidationErrors;
@@ -21,8 +21,14 @@ export const validateKey =
   };
 
 export const validate = <T>(objectValidator: Validator<T>, object: T): ValidationResult<T> =>
-  mapValues(objectValidator, <K extends keyof T>(validateValue: ValueValidator<T[K]>, key: K) =>
-    validateValue(object[key])) as ValidationResult<T>;
+  pickBy(
+    mapValues(
+      objectValidator,
+      <K extends keyof T>(validateValue: ValueValidator<T[K]>, key: K) =>
+        validateValue(object[key]),
+    ) as ValidationResult<T>,
+    (errors) => errors && errors.length > 0,
+  );
 
 export const hasValidationErrors = <T>(result: ValidationResult<T>): boolean =>
   some(result as object, (validationErrors: ValidationErrors) => (validationErrors && validationErrors.length > 0));
