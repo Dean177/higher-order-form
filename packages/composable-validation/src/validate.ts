@@ -1,28 +1,32 @@
 import { flatMap, mapValues, some } from 'lodash';
 
 export type ValidationErrors = Array<string>;
-export type ValueValidator<T> = (value: T) => ValidationErrors;
 
-export type Validator<T> = {
-  [P in keyof T]?: ValueValidator<T[P]>
+export type ValidationResult<T> = ValidationErrors | {
+  [P in keyof T]?: ValidationErrors | ValidationResult<T[P]>
 };
 
-export type ValidationResult<T> = {
-  [P in keyof T]?: ValidationErrors
+export type ValueValidator<T> = (value: T) => ValidationErrors;
+
+export type ObjectValidator<T> = {
+  [P in keyof T]?: ObjectValidator<T[P]> | ValueValidator<T[P]>
+};
+
+export type Validator<T> = ObjectValidator<T> | ValueValidator<T>;
+
+
+export const validate = <T>(validator: Validator<T>, target: T): ValidationResult<T> => {
+  if (typeof validator === 'function') {
+    return validator(target);
+  }
+
+  return mapValues(validator, (validateValue: ValueValidator<T[keyof T]>, key: keyof T) =>
+    validate(validateValue, target[key])) as ValidationResult<T>;
 };
 
 export const rules = <T>(...validators: Array<ValueValidator<T>>): ValueValidator<T> =>
   (value) => flatMap(validators, (validator) => validator(value));
 
-export const validateKey =
-  <T, K extends keyof T>(objectValidator: Validator<T>, key: K, value: T[K]): ValidationErrors => {
-    const validator: ValueValidator<T[K]> | undefined = objectValidator[key];
-    return validator != null ? validator(value) : [];
-  };
-
-export const validate = <T>(objectValidator: Validator<T>, object: T): ValidationResult<T> =>
-  mapValues(objectValidator, <K extends keyof T>(validateValue: ValueValidator<T[K]>, key: K) =>
-    validateValue(object[key])) as ValidationResult<T>;
-
 export const hasValidationErrors = <T>(result: ValidationResult<T>): boolean =>
-  some(result as object, (validationErrors: ValidationErrors) => (validationErrors && validationErrors.length > 0));
+  some(result as object, (validationErrors: ValidationErrors) =>
+    (validationErrors && validationErrors.length > 0));

@@ -1,5 +1,6 @@
 import { endsWith, flatten, startsWith } from 'lodash';
-import { rules, validate, ValueValidator, Validator } from './validate';
+import { rules, validate, ValueValidator, ObjectValidator } from './validate';
+import { maxLength } from '../../composable-validation-validators/src/textValidators';
 
 export const maxLength = (max: number): ValueValidator<string | null> =>
   (value: string | null) => (value != null && value.length > max) ? [`Text must be less than ${max} characters`] : [];
@@ -30,11 +31,24 @@ describe('rules', () => {
 });
 
 describe('validate', () => {
-  it('returns an object whose keys represent', () => {
-    interface MyObject { name: string }
-    const constraints: Validator<MyObject> = { name: rules(minLength(5), maxLength(10)) };
-    const validationResult = (validate(constraints, { name: '' }) as any).name;
+  it('accepts a ValueValidator, and will return an array of errors', () => {
+    expect(validate(minLength(10), 'fail').length).toBeGreaterThan(0);
+  });
 
-    expect((validationResult && validationResult.length)).toBeGreaterThan(0);
+  it('accepts an ObjectValidator, returning a ValidationResult', () => {
+    expect(validate({ name: minLength(11) }, { name: 'fail' })).toBe({ name: [] });
+  });
+
+  it('works with nested ObjectValidators', () => {
+    const constraints = {
+      name: rules(minLength(5), maxLength(10)),
+      address: {
+        postcode: maxLength(5),
+      },
+    };
+    const result: any = validate(constraints, { name: '', address: { postcode: '' } }) as any;
+
+    expect(result.name.length).toBeGreaterThan(0);
+    expect(result.address.postcode).toBeGreaterThan(0);
   });
 });
