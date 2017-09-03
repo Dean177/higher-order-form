@@ -1,5 +1,5 @@
 import { endsWith, flatten, startsWith } from 'lodash';
-import { rules, validate, ValueValidator, Validator } from './validate';
+import { rules, validate, ValueValidator, Validator, required, optional } from './validate';
 
 export const maxLength = (max: number): ValueValidator<string | null> =>
   (value: string | null) => (value != null && value.length > max) ? [`Text must be less than ${max} characters`] : [];
@@ -36,5 +36,39 @@ describe('validate', () => {
     const validationResult = (validate(constraints, { name: '' }) as any).name;
 
     expect((validationResult && validationResult.length)).toBeGreaterThan(0);
+  });
+});
+
+describe('required', () => {
+  it('will fail if no value is provided', () => {
+    const validator = required(minLength(8));
+    expect(validator(null).length).toBeGreaterThan(0);
+  });
+
+  it('will fail if a value is provided and the sub validators fail', () => {
+    const validator = required(minLength(8));
+    expect(validator('012').length).toBeGreaterThan(0);
+  });
+
+  it('will succeed if a value is provided and the sub validators pass', () => {
+    const validator = required(minLength(8));
+    expect(validator('01234567').length).toBe(0);
+  });
+});
+
+describe('optional', () => {
+  it('will fail pass no value is provided', () => {
+    const validator = optional(minLength(8));
+    expect(validator(null).length).toBe(0);
+  });
+
+  it('will fail if a value is provided and the sub validators fail', () => {
+    const validator = optional(minLength(8));
+    expect(validator('012').length).toBeGreaterThan(0);
+  });
+
+  it('will succeed if a value is provided and the sub validators pass', () => {
+    const validator = optional(minLength(8));
+    expect(validator('01234567').length).toBe(0);
   });
 });

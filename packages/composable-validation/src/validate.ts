@@ -26,3 +26,21 @@ export const validate = <T>(objectValidator: Validator<T>, object: T): Validatio
 
 export const hasValidationErrors = <T>(result: ValidationResult<T>): boolean =>
   some(result as object, (validationErrors: ValidationErrors) => (validationErrors && validationErrors.length > 0));
+
+export const required = <T>(...validators: Array<ValueValidator<T>>): ValueValidator<T | null | undefined> =>
+  (val: T | null | undefined) => {
+    if ((val == null) || (typeof val === 'string' && val.length === 0)) {
+      return ['Required'];
+    }
+
+    return rules(...validators)(val);
+  };
+
+export const optional = <T>(...validators: Array<ValueValidator<T>>): ValueValidator<T | null | undefined> =>
+  (val: T | null | undefined) => {
+    if (val == null) {
+      return [];
+    }
+
+    return rules(...validators)(val);
+  };

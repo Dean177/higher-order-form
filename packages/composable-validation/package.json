@@ -45,8 +45,8 @@
     "build": "rm -rf dist && tsc",
     "build:dev": "tsc --noEmit --pretty --watch",
     "dev": "concurrently -n \"make,test\" \"npm run build:dev\" \"npm run test:dev\"",
-    "test": "jest --coverage",
-    "test:dev": "jest --watch",
+    "test": "jest --watch",
+    "test:ci": "jest --coverage",
     "prepublish": "npm run test && npm run build"
   },
   "version": "0.0.6"
