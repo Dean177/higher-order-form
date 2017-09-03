@@ -1,5 +1,5 @@
 import { endsWith, flatten, startsWith } from 'lodash';
-import { rules, validate, ValueValidator, Validator, required, optional } from './validate';
+import { rules, validate, ValueValidator, Validator, required, optional, hasValidationErrors } from './validate';
 
 export const maxLength = (max: number): ValueValidator<string | null> =>
   (value: string | null) => (value != null && value.length > max) ? [`Text must be less than ${max} characters`] : [];
@@ -28,6 +28,16 @@ describe('rules', () => {
     expect(validationResult).toEqual(flatten([beginsWithA(sampleInput), finishesWithC(sampleInput)]));
   });
 });
+
+describe('hasValidationErrors', () => {
+  it('returns false when given an empty object', () => {
+    expect(hasValidationErrors({})).toBe(false);
+  });
+
+  it('returns true when any property is invalid', () => {
+    expect(hasValidationErrors({ foo: ['fail']})).toBe(true);
+  });
+})
 
 describe('validate', () => {
   it('returns an object whose keys represent', () => {

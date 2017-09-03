@@ -14,12 +14,6 @@ export type ValidationResult<T> = {
 export const rules = <T>(...validators: Array<ValueValidator<T>>): ValueValidator<T> =>
   (value) => flatMap(validators, (validator) => validator(value));
 
-export const validateKey =
-  <T, K extends keyof T>(objectValidator: Validator<T>, key: K, value: T[K]): ValidationErrors => {
-    const validator: ValueValidator<T[K]> | undefined = objectValidator[key];
-    return validator != null ? validator(value) : [];
-  };
-
 export const validate = <T>(objectValidator: Validator<T>, object: T): ValidationResult<T> =>
   mapValues(objectValidator, <K extends keyof T>(validateValue: ValueValidator<T[K]>, key: K) =>
     validateValue(object[key])) as ValidationResult<T>;
