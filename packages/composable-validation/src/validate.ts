@@ -1,63 +1,41 @@
-import { flatMap, mapValues, pickBy, some } from 'lodash'
+import { flatMap, isArray, mapValues, pickBy, some } from 'lodash'
 
-export type ValidationErrors = Array<string>;
+export type ValueValidationResult = Array<string>
 
-export type ValidationResult<T> = ValidationErrors | {
-  [P in keyof T]?: ValidationErrors | ValidationResult<T[P]>
-};
+export type NestedValidationResult<T> =
+  { [K in keyof T]?: ValueValidationResult | NestedValidationResult<T[K]> }
 
-export type ValueValidator<T> = (value: T) => ValidationErrors;
+export type ValidationResult<T> =
+  ValueValidationResult | NestedValidationResult<T>
 
-export type ObjectValidator<T> = {
-  [P in keyof T]?: ObjectValidator<T[P]> | ValueValidator<T[P]>
-};
+export type ValueValidator<T> = (value: T) => ValueValidationResult
+export type FlatValidator<T> = (value: T) => NestedValidationResult<T>
 
-export type Validator<T> = ObjectValidator<T> | ValueValidator<T>;
+// TODO remove this type
+export type FlatValidatorFn<T> = (value: T) => ValueValidationResult | NestedValidationResult<T>
 
+export type NestedValidator<T> =
+  { [K in keyof T]?: NestedValidator<T[K]> | FlatValidator<T[K]> | ValueValidator<T[K]> }
 
-export const validate = <T>(validator: Validator<T>, target: T): ValidationResult<T> => {
+export type Validator<T> =
+  ValueValidator<T> | FlatValidator<T> | NestedValidator<T>
+
+export function validate<T>(validator: ValueValidator<T>, target: T): ValueValidationResult
+export function validate<T>(validator: FlatValidator<T>, target: T): NestedValidationResult<T>
+export function validate<T>(validator: NestedValidator<T>, target: T): NestedValidationResult<T>
+export function validate<T>(validator: Validator<T>, target: T): ValidationResult<T> {
   if (typeof validator === 'function') {
-    return validator(target);
+    return validator(target)
   }
 
-  return mapValues(validator, (validateValue: ValueValidator<T[keyof T]>, key: keyof T) =>
-    validate(validateValue, target[key])) as ValidationResult<T>;
-};
+  const result = mapValues(validator, (subValidator: NestedValidator<T[keyof T]>, key: keyof T) =>
+    validate(subValidator, target[key]))
 
-export const rules = <T>(...validators: Array<ValueValidator<T>>): ValueValidator<T> =>
-  (value) => flatMap(validators, (validator) => validator(value))
-
-export const validate = <T>(objectValidator: Validator<T>, object: T): ValidationResult<T> =>
-  pickBy(
-    mapValues(
-      objectValidator,
-      <K extends keyof T>(validateValue: ValueValidator<T[K]>, key: K) =>
-        validateValue(object[key]),
-    ) as ValidationResult<T>,
-    (errors) => errors && errors.length > 0,
-  )
-
-  (value) => flatMap(validators, (validator) => validator(value));
+  return pickBy(result, (errors) => isArray(errors) ? errors.length > 0 : errors != null)
+}
 
 export const hasValidationErrors = <T>(result: ValidationResult<T>): boolean =>
-  some(result as object, (validationErrors: ValidationErrors) =>
-    (validationErrors && validationErrors.length > 0));
-  some(result as object, (validationErrors: ValidationErrors) => (validationErrors && validationErrors.length > 0))
-
-export const required = <T>(...validators: Array<ValueValidator<T>>): ValueValidator<T | null | undefined> =>
-  (val: T | null | undefined) => {
-    if ((val == null) || (typeof val === 'string' && val.length === 0)) {
-      return ['Required']
-    }
-
-    return rules(...validators)(val)
-  }
-
-export const optional = <T>(...validators: Array<ValueValidator<T>>): ValueValidator<T | null | undefined> =>
-  (val: T | null | undefined) => {
-    if (val == null) {
-      return []
-    }
-
-    return rules(...validators)(val)
-  }
+  some(result as object, (validationErrors: ValueValidationResult) =>
+    isArray(validationErrors)
+      ? validationErrors.length > 0
+      : (validationErrors != null && hasValidationErrors(validationErrors)))

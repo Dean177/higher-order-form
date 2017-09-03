@@ -1,13 +1,28 @@
-import { ValueValidator } from './validate'
+import { flatMap } from 'lodash';
+import { FlatValidator, FlatValidatorFn, validate, Validator, ValueValidator } from './validate'
 
-export const requiredWithMessage =
-  (message: string): ValueValidator<any> => (value) => { // tslint:disable-line:no-any
-    const isNotPresent = value == null ||
-      (typeof value === 'string' && value.trim().length === 0) ||
-      (value instanceof Array && value.length === 0)
+// TODO remove the casts
+export const requiredWithMessage = (message: string) =>
+  <T>(validator: Validator<T>): FlatValidatorFn<T | null | undefined> => (val: T | null | undefined) => {
+    if ((val == null) || (typeof val === 'string' && val.length === 0)) {
+      return [message]
+    }
 
-    return isNotPresent ? [message] : []
+    return validate(validator as FlatValidator<T>, val)
   }
 
-export const required: ValueValidator<any> = // tslint:disable-line:no-any
+export const required: Validator<any> = // tslint:disable-line:no-any
   requiredWithMessage('Please complete this field')
+
+
+export const optional = <T>(validator: Validator<T>): FlatValidatorFn<T | null | undefined> =>
+  (val: T | null | undefined) => {
+    if (val == null) {
+      return []
+    }
+
+    return validate(validator as FlatValidator<T>, val)
+  }
+
+export const rules = <T>(...validators: Array<ValueValidator<T>>): ValueValidator<T> =>
+  (value) => flatMap(validators, (validator) => validator(value))

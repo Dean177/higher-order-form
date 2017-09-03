@@ -1,3 +1,3 @@
 export * from './onlyIf'
-export * from './required'
+export * from './combinators'
 export * from './validate'
