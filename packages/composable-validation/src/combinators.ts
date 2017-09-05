@@ -1,7 +1,14 @@
 import { flatMap } from 'lodash';
 import { FlatValidator, FlatValidatorFn, validate, Validator, ValueValidator } from './validate'
 
-// TODO remove the casts
+// TODO remove the casts, the FlatValidatorFn type
+export const onlyIf =
+  <T>(condition: boolean | ((val: T) => boolean), validator: Validator<T>): FlatValidatorFn<T> => (value: T) => {
+    const returnValidationErrors = typeof condition === 'function' ? condition(value) : condition
+    return returnValidationErrors ? validate(validator as FlatValidator<T>, value) : []
+  }
+
+// TODO remove the casts, the FlatValidatorFn type
 export const requiredWithMessage = (message: string) =>
   <T>(validator: Validator<T>): FlatValidatorFn<T | null | undefined> => (val: T | null | undefined) => {
     if ((val == null) || (typeof val === 'string' && val.length === 0)) {
@@ -13,7 +20,6 @@ export const requiredWithMessage = (message: string) =>
 
 export const required: Validator<any> = // tslint:disable-line:no-any
   requiredWithMessage('Please complete this field')
-
 
 export const optional = <T>(validator: Validator<T>): FlatValidatorFn<T | null | undefined> =>
   (val: T | null | undefined) => {

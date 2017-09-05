@@ -1,9 +1,59 @@
-import { endsWith, flatten, startsWith } from 'lodash';
-import { optional, required, requiredWithMessage, rules } from './combinators'
+import { endsWith, flatten, includes as includesLd, startsWith } from 'lodash';
+import { onlyIf, optional, required, requiredWithMessage, rules } from './combinators'
 import { validate, ValueValidator } from './validate'
 
-export const minLength = (min: number): ValueValidator<string> =>
-  (value: string) => value.length < min ? [`Must be at least ${min} characters`] : []
+const includes = <T>(matchingValue: T): ValueValidator<Array<T>> => (value) =>
+  includesLd(value, matchingValue) ? [`Must include ${matchingValue}`] : []
+
+const minLength = (min: number): ValueValidator<string> =>
+  (value: string) => value.length < min ? [`Must be at least ${min} in length`] : []
+
+const lessThan = (max: number): ValueValidator<number> =>
+  (value: number) => value < max ? [`Must be at most ${max}`] : []
+
+describe('onlyIf', () => {
+  const alwaysError = (value: string) => [value]
+  it('returns errors from its validator if the conditional is truthy', () => {
+    const result = onlyIf(true, alwaysError)('some string')
+    expect(result.length).toBeGreaterThan(0)
+  })
+
+  it('returns errors from its validator if the conditional function is truthy', () => {
+    const result = onlyIf(() => true, alwaysError)('some string')
+    expect(result.length).toBeGreaterThan(0)
+  })
+
+  it('returns no errors if the condition is falsy', () => {
+    const result = onlyIf(false, alwaysError)('some string')
+    expect(result.length).toBe(0)
+  })
+
+  it('returns no errors if the condition function is falsy', () => {
+    const result = onlyIf(() => false, alwaysError)('some string')
+    expect(result.length).toBe(0)
+  })
+
+  it('The predicate has the value passed to it', () => {
+    const nestedValue = { bat: 'two', cat: 'three' }
+    const model = { ant: nestedValue }
+    const spy = jest.fn();
+    const validator = {
+      ant: onlyIf(
+        (nv) => {
+          spy(nv);
+          return false;
+        },
+        {
+          bat: minLength(2),
+          cat: minLength(3),
+        }
+      )}
+
+      validate(validator, model)
+
+      expect(spy).toHaveBeenCalledWith(nestedValue)
+  })
+})
 
 describe('required', () => {
   it('returns no error for some text', () => {
