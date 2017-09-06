@@ -16,8 +16,8 @@ import {
   validate,
   ValidationResult,
   Validator,
+  ValueValidationResult,
 } from 'composable-validation'
-import { ValueValidationResult } from '../../composable-validation/src/validate'
 
 type TODO = any // TODO remove
 
