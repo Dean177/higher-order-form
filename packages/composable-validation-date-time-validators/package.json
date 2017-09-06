@@ -45,9 +45,9 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "name": "composable-validation-validators",
+  "name": "composable-validation-date-time-validators",
   "scripts": {
     "test": "jest"
   },
-  "version": "0.0.9"
+  "version": "0.0.10"
 }
