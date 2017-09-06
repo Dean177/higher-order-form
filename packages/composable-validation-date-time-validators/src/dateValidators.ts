@@ -1,12 +1,15 @@
 import { ValueValidator } from '../validate'
-import * as moment from 'moment'
+import * as moment from 'moment-timezone'
 import {
   DateRange,
   DateStamp,
   dateToStartOfDayMoment,
   startOfTodayMoment,
 } from '../models/DateStamp'
-import { currentTimeStamp, TimeStamp } from '../models/TimeStamp'
+
+export type TimeStamp = string
+
+export const currentTimeStamp = moment.tz
 
 export const timeStampInFuture: ValueValidator<TimeStamp> = (timestamp: TimeStamp) =>
     moment(timestamp).isSameOrBefore(moment()) ? ['Please enter a time in the future'] : []

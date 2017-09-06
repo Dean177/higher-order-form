@@ -15,6 +15,11 @@ describe('textValidators', () => {
       const result = maxLength(max)('12345')
       expect(result.length).toBe(0)
     })
+
+    it('accepts arrays', () => {
+      expect(maxLength(max)([1,2,3,4,5]).length).toBe(0)
+      expect(maxLength(max)([1, 2, 3, 4, 5, 6, 7]).length).toBeGreaterThan(0)
+    })
   })
 
   describe('minLength', () => {

@@ -14,11 +14,10 @@ import {
 import {
   hasValidationErrors,
   validate,
-  validateKey,
-  ValidationErrors,
   ValidationResult,
   Validator,
 } from 'composable-validation'
+import { ValueValidationResult } from '../../composable-validation/src/validate'
 
 type TODO = any // TODO remove
 
@@ -65,10 +64,10 @@ export type Form<FormModel> = {
 export type FieldName<FormModel> = keyof FormModel
 type ByFormKey<FormModel, T> = { [K in keyof FormModel]: T }
 
-type FieldMeta = { hasBlurred: boolean, errors: ValidationErrors }
+type FieldMeta = { hasBlurred: boolean, errors: ValueValidationResult }
 type FieldsMeta<FM> = ByFormKey<FM, FieldMeta>
 
-const noValidationErrors: ValidationErrors = []
+const noValidationErrors: ValueValidationResult = []
 
 type FormWrapperState<FM> = { fieldMeta: FieldsMeta<FM>, values: FM }
 
@@ -90,12 +89,11 @@ export const withForm =
           super(props)
           const values: FM = config.initialValues(props)
           const initialValidator: Validator<FM> = config.validator(values, props)
-
-          const getFieldForFieldName = (value: FM[FieldName<FM>], fieldName: FieldName<FM>): FieldMeta => ({
-            errors: validateKey<FM, FieldName<FM>>(initialValidator, fieldName, value),
+          const initialValidationResult: TODO = validate(initialValidator as TODO, values);
+          const fieldMeta = mapValues(values, (value: FM[FieldName<FM>], fieldName: FieldName<FM>): FieldMeta => ({
+            errors: initialValidationResult[fieldName],
             hasBlurred: false,
-          })
-          const fieldMeta = mapValues(values, getFieldForFieldName) as TODO as FieldsMeta<FM>
+          })) as TODO as FieldsMeta<FM>
 
           this.state = {
             fieldMeta,
@@ -107,14 +105,14 @@ export const withForm =
           pickBy(
             mapValues(
               this.state.fieldMeta,
-              (meta: FieldMeta): ValidationErrors =>
+              (meta: FieldMeta): ValueValidationResult =>
                 ((meta != null && meta.hasBlurred) ? (meta.errors) : noValidationErrors),
             ) as TODO as ValidationResult<FM>,
             (errors) => errors && errors.length > 0
           )
 
         ifValid = (callbackIfValid: (formModel: FM) => void): void => {
-          const validationResult = validate(config.validator(this.state.values, this.props), this.state.values)
+          const validationResult = validate(config.validator(this.state.values, this.props) as TODO, this.state.values)
           if (!hasValidationErrors(validationResult)) {
             callbackIfValid(this.state.values)
           } else {
@@ -162,12 +160,13 @@ export const withForm =
                 const newValue = getValueFromEvent(event)
                 this.setState(currentState => { // tslint:disable-line:no-any
                   const nextValues = assign({}, currentState.values, { [fieldName]: newValue })
-                  const validatorInstance = config.validator(nextValues, this.props)
+                  const validatorInstance: Validator<FM> = config.validator(nextValues, this.props)
+                  const validationResult: TODO = validate(validatorInstance as TODO, nextValues)
                   const nextFieldMeta = mapValues(
                     currentState.fieldMeta,
                     (currentFieldMeta, keyFieldName: keyof FM) => ({
                       ...currentFieldMeta,
-                      errors: validateKey(validatorInstance, keyFieldName, nextValues[keyFieldName]),
+                      errors: validationResult[keyFieldName],
                     }),
                   )
 
