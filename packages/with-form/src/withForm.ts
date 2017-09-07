@@ -56,7 +56,7 @@ export type Form<FormModel> = {
     hasValidationErrors: boolean,
     ifValid: (callback: (formModel: FormModel) => void) => void,
     saveFormControlLabelRef: (formField: FieldName<FormModel>) => (node: ReactNode) => void,
-    submit: EventHandler<FormEvent<HTMLFormElement>>,
+    submit: submit: EventHandler<FormEvent<HTMLFormElement>> & React.MouseEventHandler<FormEvent<HTMLFormElement>>,
     validationErrors: () => ValidationResult<FormModel>,
   },
 }
