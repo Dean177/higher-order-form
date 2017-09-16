@@ -1,4 +1,4 @@
-import { flatMap, isArray, mapValues, pickBy, some } from 'lodash'
+import { isArray, mapValues, pickBy, some } from 'lodash'
 
 export type ValueValidationResult = Array<string>
 

@@ -7,6 +7,8 @@ import {
   ComponentType,
   EventHandler,
   FormEvent,
+  MouseEvent,
+  MouseEventHandler,
   PureComponent,
   ReactElement,
   ReactNode,
@@ -56,7 +58,9 @@ export type Form<FormModel> = {
     hasValidationErrors: boolean,
     ifValid: (callback: (formModel: FormModel) => void) => void,
     saveFormControlLabelRef: (formField: FieldName<FormModel>) => (node: ReactNode) => void,
-    submit: EventHandler<FormEvent<HTMLFormElement>>,
+    submit:
+      EventHandler<FormEvent<HTMLFormElement>> &
+      MouseEventHandler<{}>,
     validationErrors: () => ValidationResult<FormModel>,
   },
 }
@@ -125,7 +129,7 @@ export const withForm =
           }
         }
 
-        onSubmit = (event: FormEvent<HTMLFormElement>): void => {
+        onSubmit = (event: FormEvent<HTMLFormElement> & MouseEvent<{}>): void => {
           event.preventDefault()
           this.ifValid(config.onSubmit(this.props))
         }
