@@ -129,7 +129,7 @@ export const withForm =
           }
         }
 
-        onSubmit = (event: FormEvent<HTMLFormElement> & MouseEvent<{}>): void => {
+        onSubmit = (event: FormEvent<HTMLFormElement>): void => {
           event.preventDefault()
           this.ifValid(config.onSubmit(this.props))
         }
