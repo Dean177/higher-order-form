@@ -56,6 +56,16 @@ describe('onlyIf', () => {
 })
 
 describe('required', () => {
+  it('has a default validator, so it can be used on its own', () => {
+    const validator = required()
+    expect(validator(undefined).length).not.toBe(0)
+    expect(validator(null).length).not.toBe(0)
+    expect(validator(5).length).toBe(0)
+    expect(validator('string').length).toBe(0)
+    expect(validator({}).length).toBe(0)
+    expect(validator([]).length).toBe(0)
+  })
+
   it('returns no error for some text', () => {
     const result = required(minLength(1))('a')
     expect(result.length).toBe(0)

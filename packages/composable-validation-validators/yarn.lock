@@ -461,6 +461,13 @@ combined-stream@^1.0.5, combined-stream@~1.0.5:
   dependencies:
     delayed-stream "~1.0.0"
 
+composable-validation@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/composable-validation/-/composable-validation-0.1.0.tgz#666c5a71a7c5ea7cc573cbbb7922a9cb2077822f"
+  dependencies:
+    "@types/lodash" "4.14.71"
+    lodash "4.17.4"
+
 concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"

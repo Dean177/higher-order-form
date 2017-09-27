@@ -1,9 +1,10 @@
 {
-	"devDependencies": {
-		"lerna": "^2.0.0"
-	},
+  "devDependencies": {
+    "lerna": "^2.0.0"
+  },
   "license": "MIT",
   "scripts": {
-    "bootstrap": "lerna bootstrap"
+    "bootstrap": "lerna bootstrap",
+    "publish-packages": "lerna publish"
   }
 }

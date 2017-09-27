@@ -222,7 +222,7 @@ export const withForm =
             saveFormControlLabelRef: this.saveFormControlLabelRef,
             submit: this.onSubmit,
             validationErrors: this.validationErrors,
-          }}
+          }} as Form<FM>
 
           const enhancedProps: OP & Form<FM> = assign({}, this.props, formProps)
 

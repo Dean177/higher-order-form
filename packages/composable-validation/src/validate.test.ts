@@ -1,4 +1,4 @@
-import { validate, ValueValidator, Validator, hasValidationErrors } from './validate'
+import { validate, ValueValidator, Validator, hasValidationErrors, identityValidator } from './validate'
 
 export const maxLength = (max: number): ValueValidator<string | null> =>
   (value: string | null) => (value != null && value.length > max) ? [`Text must be less than ${max} characters`] : []
@@ -87,6 +87,12 @@ describe('hasValidationErrors', () => {
   it('returns true when any nested property is a non-empty array', () => {
     expect(hasValidationErrors({ ant: [], bat: { cat: ['fail'] } })).toBe(true)
     expect(hasValidationErrors({ ant: [], bat: { cat: [], dog: ['fail'] } })).toBe(true)
+  })
+})
+
+describe('identityValidator', () => {
+  it('always returns no errors for any value it is given', () => {
+    expect(identityValidator('value').length).toBe(0)
   })
 })
 

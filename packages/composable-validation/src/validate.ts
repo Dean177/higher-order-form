@@ -39,3 +39,5 @@ export const hasValidationErrors = <T>(result: ValidationResult<T>): boolean =>
     isArray(validationErrors)
       ? validationErrors.length > 0
       : (validationErrors != null && hasValidationErrors(validationErrors)))
+
+export const identityValidator = <T>(val: T) => []
