@@ -1,14 +1,22 @@
 {
+  "private": true,
   "dependencies": {
-    "@types/lodash": "4.14.71",
     "lodash": "4.17.4"
+  },
+  "peerDependencies": {
+    "composable-validation": "^0.0.9"
   },
   "devDependencies": {
     "@types/jest": "20.0.5",
+    "@types/lodash": "4.14.71",
+    "composable-validation": "^0.0.9",
     "jest": "20.0.4",
     "ts-jest": "20.0.7",
     "typescript": "2.4.2"
   },
+  "files": [
+    "dist"
+  ],
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}"
@@ -35,19 +43,11 @@
     }
   },
   "license": "MIT",
-  "files": [
-    "dist"
-  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "name": "composable-validation",
+  "name": "composable-validation-date-time-validators",
   "scripts": {
-    "build": "rm -rf dist && tsc",
-    "build:dev": "tsc --noEmit --pretty --watch",
-    "dev": "concurrently -n \"make,test\" \"npm run build:dev\" \"npm run test:dev\"",
-    "test:dev": "jest --watch",
-    "test": "jest --coverage",
-    "prepublish": "npm run test && npm run build"
+    "test": "jest"
   },
-  "version": "0.0.9"
+  "version": "0.0.10"
 }

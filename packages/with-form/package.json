@@ -1,9 +1,9 @@
 {
   "author": "Dean Merchant",
   "name": "with-form",
-  "version": "0.0.8",
+  "version": "0.0.10",
   "dependencies": {
-    "composable-validation": "0.0.7",
+    "composable-validation": "^0.0.9",
     "lodash": "4.17.4"
   },
   "peerDependencies": {
