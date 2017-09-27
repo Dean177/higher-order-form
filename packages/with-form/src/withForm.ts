@@ -206,8 +206,10 @@ export const withForm =
         }
 
         render() {
-          const hasUserVisibleValidationErrors  =
-            some(this.state.fieldMeta as object, ((fm: FieldMeta) => fm.hasBlurred && fm.errors.length > 0));
+          const hasUserVisibleValidationErrors = some(
+            this.state.fieldMeta as object,
+            (fm: FieldMeta) => fm.hasBlurred && fm.errors && fm.errors.length > 0
+          );
 
           const formProps: Form<FM> = { form: {
             controlFor: this.controlFor,
