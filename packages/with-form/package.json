@@ -7,8 +7,8 @@
     "lodash": "4.17.4"
   },
   "peerDependencies": {
-    "react": "15.6.x",
-    "react-dom": "15.6.x"
+    "react": "15.6.x || 16.x",
+    "react-dom": "15.6.x || 16.x"
   },
   "devDependencies": {
     "@types/enzyme": "2.8.4",
