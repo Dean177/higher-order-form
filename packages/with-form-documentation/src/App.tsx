@@ -159,7 +159,7 @@ export const App = () => (
           data-count-href="/dean177/higher-order-form/stargazers"
           data-show-count="true"
           data-count-aria-label="# stargazers on GitHub"
-          aria-label="Star dean177/with-notification-system on GitHub"
+          aria-label="Star dean177/higher-order-form on GitHub"
         >
           Star
         </a>

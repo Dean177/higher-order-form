@@ -1,5 +1,9 @@
 # composable-validation
 
+[![Npm](https://badge.fury.io/js/composable-validation.svg)](https://www.npmjs.com/package/composable-validation)
+[![CircleCI](https://circleci.com/gh/Dean177/with-notification-system.svg?style=svg)](https://circleci.com/gh/Dean177/higher-order-form)
+[![Greenkeeper badge](https://badges.greenkeeper.io/Dean177/higher-order-form.svg)](https://greenkeeper.io/)
+
 A declarative and functional way to do validation
  
 ## Installation
