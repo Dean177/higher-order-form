@@ -1,0 +1,26 @@
+{
+  "name": "with-form-example-documentation",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@types/react-codemirror": "1.0.0",
+    "composable-validation": "0.1.0",
+    "react": "^16.0.0",
+    "react-codemirror": "1.0.0",
+    "react-dom": "^16.0.0",
+    "with-form": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "8.0.47",
+    "@types/react": "16.0.20",
+    "@types/react-dom": "16.0.2",
+    "react-scripts-ts": "2.8.0"
+  },
+  "homepage": "https://dean177.github.io/higher-order-form",
+  "scripts": {
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject"
+  }
+}
