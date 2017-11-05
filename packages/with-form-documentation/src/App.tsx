@@ -1,4 +1,4 @@
-import { optional, required, rules } from 'composable-validation'
+import { optional, required, rules, valid } from 'composable-validation'
 import { maxValue } from 'composable-validation/dist/validators/number'
 import { maxLength, minLength } from 'composable-validation/dist/validators/text'
 import * as React from 'react'
@@ -88,34 +88,36 @@ const BasicFormExample = enhance((props: BasicFormProps) => (
 
 type ValidatedFormModel = {
   booleanField: boolean,
-  numericField: number | string,
+  numericField: React.ReactText,
   optionalStringField: string,
   stringField: string,
 }
 
-type ValidatedFormOwnProps = { numberProp: number, booleanProp: boolean }
-type ValidatedFormProps = ValidatedFormOwnProps & FormProps<BasicFormModel>
+type ValidatedOwnProps = { numberProp: number, booleanProp: boolean }
 
-const validatedEnhance = withForm<ValidatedFormProps, ValidatedFormModel>({
-  initialValues: (props: ValidatedFormProps): ValidatedFormModel => ({
-    booleanField: false,
+type ValidatedFormProps = ValidatedOwnProps & FormProps<ValidatedFormModel>
+
+const validatedEnhance = withForm<ValidatedOwnProps, ValidatedFormModel>({
+  initialValues: (props: ValidatedOwnProps): ValidatedFormModel => ({
+    booleanField: props.booleanProp,
     numericField: '',
     optionalStringField: '',
     stringField: '',
   }),
-  validator: (props: ValidatedFormProps) => (formValues: ValidatedFormModel) => ({
-    numericField: required(maxValue(props.numberProp)),
+  validator: (props: ValidatedOwnProps) => (formValues: ValidatedFormModel) => ({
+    numericField: (val: React.ReactText) =>
+      Number(val) >= props.numberProp ? [`Must be less than ${props.numberProp}`] : valid,
     optionalStringField: optional(maxLength(props.numberProp)),
     stringField: required(
       rules(maxLength(200), minLength(3)),
     ),
   }),
-  onSubmit: () => (formValues: ValidatedFormModel) => {
+  onSubmit: (props: ValidatedOwnProps) => (formValues: ValidatedFormModel) => {
     alert(JSON.stringify(formValues))
   },
 })
 
-const ValidatedFormExample: React.ComponentType<ValidatedFormOwnProps> = validatedEnhance((props: BasicFormProps) => (
+const ValidatedFormExample: React.ComponentType<ValidatedOwnProps> = validatedEnhance((props: ValidatedFormProps) => (
   <div className="FormExample">
     <form onSubmit={props.form.submit}>
       <h4>Validated form</h4>
@@ -126,7 +128,7 @@ const ValidatedFormExample: React.ComponentType<ValidatedFormOwnProps> = validat
       {props.form.controlFor.stringField(<input />)}
 
       <label>Optional string field</label>
-      {props.form.controlFor.stringField(<textarea rows={3} />)}
+      {props.form.controlFor.optionalStringField(<textarea rows={3} />)}
 
       <label>Numeric field</label>
       {props.form.controlFor.numericField(<input type="number" />)}
@@ -171,91 +173,160 @@ export const App = () => (
       <h2>Installation</h2>
       <p>Install the dependencies</p>
       <SyntaxHighlight code={`yarn install composable-validation with-form`} mode={{ name: 'shell' }} />
+
       <p>Or via npm</p>
       <SyntaxHighlight code={`npm install --save composable-validation with-form`} mode={{ name: 'shell' }} />
 
-      <h2>Usage</h2>
-      <p>Create a type represent your form</p>
-      <SyntaxHighlight
-        code={`
-type BasicFormModel = {
-  booleanField: boolean,
-  stringField: string,
-  numericField: number | string,
-}
-        `}
-      />
-      <p>Decide what the initial values should be and provide callback for form submission</p>
+      <section>
+        <h2>Usage</h2>
+        <p>Create a type represent your form</p>
+        <SyntaxHighlight
+          code={`
+  type BasicFormModel = {
+    booleanField: boolean,
+    stringField: string,
+    numericField: number | string,
+  }
+          `}
+        />
+  
+        <p>Decide what the initial values should be and provide callback for form submission</p>
+        <SyntaxHighlight
+          code={`
+  const enhance = withForm<{}, BasicFormModel>({
+    initialValues: (): BasicFormModel => ({
+      booleanField: false,
+      stringField: '',
+      numericField: '',
+    }),
+    onSubmit: () => (formValues: BasicFormModel) => {
+      alert(JSON.stringify(formValues))
+    },
+  })
+          `}
+        />
+  
+        <p>Wire up some UI</p>
+        <SyntaxHighlight
+          code={`
+  const BasicFormExample = enhance((props: BasicFormProps) => (
+    <form onSubmit={props.form.submit}>
+      <h4>Basic form</h4>
+      <label>Boolean field</label>
+      {props.form.controlFor.booleanField(<input type="checkbox" />)}
+  
+      <label>String field</label>
+      {props.form.controlFor.stringField(<input />)}
+  
+      <label>Numeric field</label>
+      {props.form.controlFor.numericField(<input type="number" />)}
+  
+      <button type="submit" onClick={props.form.submit}>Submit</button>
+    </form>
+  )
+          `}
+        />
+  
+        <p>And here is what it looks like, try entering some data and submitting the form</p>
+  
+        <BasicFormExample />
+      </section>
 
-      <SyntaxHighlight
-        code={`
-const enhance = withForm<{}, BasicFormModel>({
-  initialValues: (): BasicFormModel => ({
-    booleanField: false,
-    stringField: '',
-    numericField: '',
-  }),
-  onSubmit: () => (formValues: BasicFormModel) => {
-    alert(JSON.stringify(formValues))
-  },
-})
-        `}
-      />
+      <section>
+        <h2>Validation</h2>
+        <p>Lets add some validation to prevent an invalid form submission. Lets start with some types</p>
+        <SyntaxHighlight
+          code={`
+  type ValidatedFormModel = {
+    booleanField: boolean,
+    numericField: React.ReactText,
+    optionalStringField: string,
+    stringField: string,
+  }
 
-      <p>Wire up some UI</p>
+  type ValidatedOwnProps = { numberProp: number, booleanProp: boolean }
 
-      <SyntaxHighlight
-        code={`
-const BasicFormExample = enhance((props: BasicFormProps) => (
-  <form onSubmit={props.form.submit}>
-    <h4>Basic form</h4>
-    <label>Boolean field</label>
-    {props.form.controlFor.booleanField(<input type="checkbox" />)}
+  type ValidatedFormProps = ValidatedOwnProps & FormProps<ValidatedFormModel>
+          `}
+        />
+        <p>
+          With form uses{' '}
+          <a href="https://github.com/Dean177/higher-order-form/tree/master/packages/composable-validation">
+            composable-validation
+          </a>
+          {' '}for its validation needs. Lets create a validator for our type.
+        </p>
+        <SyntaxHighlight
+          code={`
 
-    <label>String field</label>
-    {props.form.controlFor.stringField(<input />)}
+  const validatedEnhance = withForm<ValidatedOwnProps, ValidatedFormModel>({
+    initialValues: (props: ValidatedOwnProps): ValidatedFormModel => ({
+      booleanField: props.booleanProp,
+      numericField: '',
+      optionalStringField: '',
+      stringField: '',
+    }),
+    validator: (props: ValidatedOwnProps) => (formValues: ValidatedFormModel) => ({
+      numericField: (val: React.ReactText) =>
+        Number(val) >= props.numberProp ? [${'`Must be less than ${props.numberProp}`'}] : valid,
+      optionalStringField: optional(maxLength(props.numberProp)),
+      stringField: required(
+        rules(maxLength(200), minLength(3)),
+      ),
+    }),
+    onSubmit: (props: ValidatedOwnProps) => (formValues: ValidatedFormModel) => {
+      alert(JSON.stringify(formValues))
+    },
+  })
+          `}
+        />
 
-    <label>Numeric field</label>
-    {props.form.controlFor.numericField(<input type="number" />)}
+        <p>And add in some UI</p>
+        <SyntaxHighlight
+          code={`
+  const ValidatedFormExample: React.ComponentType<ValidatedOwnProps> = validatedEnhance((props: ValidatedFormProps) => (
+    <div className="FormExample">
+      <form onSubmit={props.form.submit}>
+        <h4>Validated form</h4>
+        <label>Boolean field</label>
+        {props.form.controlFor.booleanField(<input type="checkbox" />)}
 
-    <button type="submit" onClick={props.form.submit}>Submit</button>
-  </form>
-)
-        `}
-      />
+        <label>String field</label>
+        {props.form.controlFor.stringField(<input />)}
 
-      <p>Wire up some UI</p>
+        <label>Optional string field</label>
+        {props.form.controlFor.optionalStringField(<textarea rows={3} />)}
 
-      <BasicFormExample />
+        <label>Numeric field</label>
+        {props.form.controlFor.numericField(<input type="number" />)}
 
-      <p>Wire up some UI</p>
+        <button type="submit" onClick={props.form.submit}>Submit</button>
+      </form>
+      <div className="state">
+        <h5>Values</h5>
+        <pre>{JSON.stringify(props.form.values, null, 2)}</pre>
+        <h5>Validation errors</h5>
+        <pre>{JSON.stringify(props.form.validationErrors, null, 2)}</pre>
+      </div>
+    </div>
+  ))
+          `}
+        />
+        <p>This component would then be used like</p>
+        <SyntaxHighlight
+          code={`
+  <ValidatedFormExample booleanProp={true} numberProp={5} />
+          `}
+        />
+        <p>And here is a live example to play with</p>
+        <ValidatedFormExample booleanProp={true} numberProp={5} />
+      </section>
 
-      <SyntaxHighlight code={`React only equivalent of BasicFormCode???`} />
+      {/*TODO*/}
+      {/*<h2>Usage with external component libraries</h2>*/}
+      {/*<h3>Material UI</h3>*/}
 
-      <h2>Validation</h2>
-      <p>Describe how the validation works</p>
-      <p>Link to <a>composable-validation</a> for how validators work in detail</p>
-      <SyntaxHighlight
-        code={`
-type FormModel = {
-  booleanField: boolean,
-  stringField: string,
-  numericField?: number,
-  objectField?: {
-    line1: string,
-    line2: string,
-    line3: string,
-  },
-  arrayField: Array<string>,
-}
-        `}
-      />
-      <ValidatedFormExample booleanProp={true} numberProp={5} />
-
-      <h2>Usage with external component libraries</h2>
-      <h3>Material UI</h3>
-
-      <h3>Office Fabric</h3>
+      {/*<h3>Office Fabric</h3>*/}
     </div>
   </DevErrorBoundary>
 )

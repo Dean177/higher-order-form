@@ -52,7 +52,7 @@
       "<rootDir>/src/**/?(*.)(spec|test).ts?(x)"
     ],
     "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      ".(ts|tsx)": "ts-jest/preprocessor.js"
     }
   },
   "license": "MIT",
@@ -65,6 +65,6 @@
     "start": "concurrently -n \"make,test\" \"yarn build:dev\" \"yarn test:dev\"",
     "test": "jest --coverage",
     "test:dev": "jest --watch",
-    "prepublish": "rm -rf dist && npm run test && npm run build"
+    "prepublish": "rm -rf dist && yarn test && yarn build"
   }
 }
