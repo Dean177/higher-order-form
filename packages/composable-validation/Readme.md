@@ -1,16 +1,20 @@
 # composable-validation
 
-A [higher-order-component](https://facebook.github.io/react/docs/higher-order-components.html) which removes boilerplate when working with forms in [React](https://facebook.github.io/react/).
+A declarative and functional way to do validation
  
 ## Installation
 
-`yarn add composable-validation composable-validation-validators`
+`yarn add composable-validation`
 
 ## Usage
 
 ```typescript
-import { required, onlyIf, optional, validate } from 'composable-validation'
-import { lessThan, includes, minLength } from 'composable-validation-validators'
+import { required, onlyIf, optional, validate, ValueValidator } from 'composable-validation'
+import { includes } from 'lodash'
+import { lessThan, minLength } from 'composable-validation/dist/text'
+
+const includes = <T>(requiredValue: T): ValueValidator<Array<T>> => (values) =>
+  includes(values, requiredValue) ? [`Must include ${requiredValue}`] : []
 
 type AnimalObject ={
   ant: string,

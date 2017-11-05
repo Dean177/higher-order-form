@@ -9,4 +9,4 @@ In the repository root run `yarn && yarn bootstrap`
 ## Packages
 
 - [composable-validation](./packages/composable-validation/Readme.md)
-- [with-form](./packages/composable-validation/Readme.md)
+- [with-form](./packages/with-form/Readme.md)

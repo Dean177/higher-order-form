@@ -172,10 +172,10 @@ export const App = () => (
       </div>
       <h2>Installation</h2>
       <p>Install the dependencies</p>
-      <SyntaxHighlight code={`yarn install composable-validation with-form`} mode={{ name: 'shell' }} />
+      <SyntaxHighlight code={`yarn install with-form`} mode={{ name: 'shell' }} />
 
       <p>Or via npm</p>
-      <SyntaxHighlight code={`npm install --save composable-validation with-form`} mode={{ name: 'shell' }} />
+      <SyntaxHighlight code={`npm install --save with-form`} mode={{ name: 'shell' }} />
 
       <section>
         <h2>Usage</h2>

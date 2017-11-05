@@ -1,10 +1,7 @@
-import { endsWith, flatten, includes as includesLd, startsWith } from 'lodash';
+import { endsWith, flatten, startsWith } from 'lodash';
 import * as array from './validators/array'
 import { onlyIf, optional, required, requiredWithMessage, rules } from './combinators'
 import { validate, ValueValidator } from './validate'
-
-const includes = <T>(matchingValue: T): ValueValidator<Array<T>> => (value) =>
-  includesLd(value, matchingValue) ? [`Must include ${matchingValue}`] : []
 
 const minLength = (min: number): ValueValidator<string> =>
   (value: string) => value.length < min ? [`Must be at least ${min} in length`] : []

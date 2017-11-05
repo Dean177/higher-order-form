@@ -4,13 +4,18 @@ A [higher-order-component](https://facebook.github.io/react/docs/higher-order-co
  
 ## Installation
 
-`yarn add composable-validation with-form`
+`yarn add with-form`
 
+or via npm
+
+`npm install --save with-form`
 ## Usage
 
-Coming soon
+See the [documentation site](https://dean177.github.io/higher-order-form) for documentation and live examples
 
-## Motivation
-Simple two way binding - example ?
-Typesafe - example ?
-Declarative validation - via composable-validation ?
+## Goals
+
+- Reduced boilerplate
+- Simple two way binding for form controls
+- Type-safe 
+- Declarative 
