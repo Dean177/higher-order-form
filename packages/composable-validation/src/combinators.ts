@@ -1,5 +1,6 @@
 import { flatMap } from 'lodash';
 import { valid, ValueValidator } from './validate'
+import { isArray } from 'util'
 
 export function onlyIf<T>(condition: boolean | ((val: T) => boolean), validator: ValueValidator<T>): ValueValidator<T> {
   return ((value: T) => {
@@ -11,16 +12,19 @@ export function onlyIf<T>(condition: boolean | ((val: T) => boolean), validator:
 }
 
 export const requiredWithMessage = (message: string) =>
-  <T>(validator: ValueValidator<T> | undefined): ValueValidator<T | null | undefined> =>
+  <T>(validator?: ValueValidator<T>): ValueValidator<T | null | undefined> =>
     (val: T | null | undefined) => {
-      if ((val == null) || (typeof val === 'string' && val.length === 0)) {
+      if (
+        (val == null)
+        || ((typeof val === 'string' || isArray(val)) && val.length === 0)
+      ) {
         return [message]
       }
 
       return validator ? validator(val) : valid
     }
 
-export const required: <T>(validator: ValueValidator<T> | undefined) => ValueValidator<T | null | undefined> =
+export const required: <T>(validator?: ValueValidator<T>) => ValueValidator<T | null | undefined> =
   requiredWithMessage('Please complete this field')
 
 

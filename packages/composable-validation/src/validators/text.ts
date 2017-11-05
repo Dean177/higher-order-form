@@ -1,10 +1,10 @@
-import { ValueValidator } from '../validate'
+import { ValueValidator, valid } from '../validate'
 
 export const maxLength = (max: number): ValueValidator<string> =>
-  (value: string) => value.length > max ? [`Must be less than ${max} characters`] : []
+  (value: string) => value.length > max ? [`Must be less than ${max} characters`] : valid
 
 export const minLength = (min: number): ValueValidator<string> =>
-  (value: string) => value.length < min ? [`Must be at least ${min} characters`] : []
+  (value: string) => value.length < min ? [`Must be at least ${min} characters`] : valid
 
 export const validEmail: ValueValidator<string> = (email: string) => {
   const parts = email.split('@')
@@ -14,5 +14,5 @@ export const validEmail: ValueValidator<string> = (email: string) => {
     before.length > 0 &&
     after.length > 0
 
-  return isValidEmail ? [] : ['Please enter a valid email']
+  return isValidEmail ? valid : ['Please enter a valid email']
 }

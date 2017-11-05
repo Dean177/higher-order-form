@@ -1,4 +1,5 @@
 import { endsWith, flatten, includes as includesLd, startsWith } from 'lodash';
+import * as array from './validators/array'
 import { onlyIf, optional, required, requiredWithMessage, rules } from './combinators'
 import { validate, ValueValidator } from './validate'
 
@@ -7,9 +8,6 @@ const includes = <T>(matchingValue: T): ValueValidator<Array<T>> => (value) =>
 
 const minLength = (min: number): ValueValidator<string> =>
   (value: string) => value.length < min ? [`Must be at least ${min} in length`] : []
-
-const lessThan = (max: number): ValueValidator<number> =>
-  (value: number) => value < max ? [`Must be at most ${max}`] : []
 
 describe('onlyIf', () => {
   const alwaysError = (value: string) => [value]
@@ -57,29 +55,29 @@ describe('onlyIf', () => {
 
 describe('required', () => {
   it('returns no error for some text', () => {
-    const result = required(minLength(1))('a')
-    expect(result.length).toBe(0)
+    expect(required()('a').length).toBe(0)
+    expect(required(minLength(1))('a').length).toBe(0)
   })
 
-  it('returns no error for an empty array', () => {
-    const missingErrors = required(minLength(0))([])
-    expect(missingErrors.length).toBe(0)
+  it('returns an error for an empty array', () => {
+    expect(required()([]).length).toBeGreaterThan(0)
+    expect(required(array.maxLength(6))([]).length).toBeGreaterThan(0)
   })
 
   it('returns no error for a filled array', () => {
-    const validator = required(minLength(1));
-    const errorsNumberArray = validator([3])
-    const errorsStringArray = validator(['String'])
-    const errorsOtherArray = validator([[]])
-
+    const errorsNumberArray = required(array.minLength(1))([1, 2])
     expect(errorsNumberArray.length).toBe(0)
+
+    const errorsStringArray =required()(['String'])
     expect(errorsStringArray.length).toBe(0)
+
+    const errorsOtherArray = required()([[]])
     expect(errorsOtherArray.length).toBe(0)
   })
 
   it('returns error for null or undefined', () => {
-    const nullErrors = required(null)
-    const undefinedErrors = required(undefined as any)
+    const nullErrors = required()(null)
+    const undefinedErrors = required()(undefined as any)
 
     expect(nullErrors.length).toBeGreaterThan(0)
     expect(undefinedErrors.length).toBeGreaterThan(0)

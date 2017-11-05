@@ -19,15 +19,13 @@ describe('textValidators', () => {
   })
 
   describe('minLength', () => {
-    const min = 3
     it('returns error under the min length', () => {
-      const result = minLength(min)('12')
-      expect(result.length).toBeGreaterThan(0)
+      expect(minLength(3)('2').length).toBeGreaterThan(0)
     })
 
     it('returns no error if equal to or over the min length', () => {
-      const result = minLength(min)('123')
-      expect(result.length).toBe(0)
+      expect(minLength(3)('123').length).toBe(0)
+      expect(minLength(3)('1234').length).toBe(0)
     })
   })
 
