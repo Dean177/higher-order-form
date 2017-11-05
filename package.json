@@ -3,9 +3,9 @@
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "build:docs": "rm -rf ./docs && cd packages/with-form-documentation && yarn && rm -rf ./node_modules/with-notification-system/node_modules/react && yarn build && mv -r ./build ../../../docs",
-    "clean": "rimraf packages/**/dist",
-    "lint": "tslint packages/composable-validation/src/**/*.ts packages/with-form/src/**/*.ts",
+    "build:docs": "rm -rf ./docs && cd packages/with-form-documentation && yarn && yarn build && mv ./build ../../docs",
+    "clean": "rimraf packages/**/dist docs",
+    "lint": "tslint packages/*/src/**/*.ts packages/*/src/**/*.tsx",
     "test": "lerna run test"
   },
   "dependencies": {

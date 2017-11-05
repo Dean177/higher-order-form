@@ -20,7 +20,7 @@ describe('textValidators', () => {
   describe('minLength', () => {
     const min = 3
     it('returns error under the min length', () => {
-      const result = minLength(min)([1,2,3])
+      const result = minLength(min)([1, 2, 3])
       expect(result.length).toBeGreaterThan(0)
     })
 

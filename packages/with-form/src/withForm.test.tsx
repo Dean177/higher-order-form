@@ -7,12 +7,12 @@ import { unwrapParentheses } from 'tslint'
 type FormModel = { field: number, otherField: string }
 type FormOwnProps = { someProp: number }
 type MockFormProps = FormOwnProps & FormProps<FormModel>
-const MockForm: React.ComponentType<MockFormProps> = (props) =>
+const MockForm: React.ComponentType<MockFormProps> = (props) => (
   <form onSubmit={props.form.submit}>
     {props.form.controlFor.field(<input />)}
     {props.form.controlFor.otherField(<input />)}
   </form>
-
+)
 const mockSubmissionEvent = { preventDefault: noop }
 
 describe('withForm', () => {
@@ -31,7 +31,7 @@ describe('withForm', () => {
   describe('withForm config', () => {
     const ownProps = { someProp: 5 }
     const initialValueSpy = jest.fn((props: FormOwnProps) => initialValues)
-    const validatorSpy = jest.fn((state: FormModel) =>({ field: (fieldValue: number): Array<string> => [] }))
+    const validatorSpy = jest.fn((state: FormModel) => ({ field: (fieldValue: number): Array<string> => [] }))
     const getValidatorSpy = jest.fn((props: FormOwnProps) => validatorSpy)
     const submitSpy = jest.fn((props: FormOwnProps) => noop)
     const ParamSpyForm: React.ComponentType<FormOwnProps> = withForm<FormOwnProps, FormModel>({

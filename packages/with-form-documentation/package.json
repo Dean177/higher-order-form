@@ -4,11 +4,11 @@
   "private": true,
   "dependencies": {
     "@types/react-codemirror": "1.0.0",
-    "composable-validation": "0.1.0",
+    "composable-validation": "^0.2.0",
     "react": "^16.0.0",
     "react-codemirror": "1.0.0",
     "react-dom": "^16.0.0",
-    "with-form": "^0.1.0"
+    "with-form": "^0.2.0"
   },
   "devDependencies": {
     "@types/node": "8.0.47",

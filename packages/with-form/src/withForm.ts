@@ -30,7 +30,7 @@ export function getValueFromEvent(e: any): any { // tslint:disable-line:no-any
   return e.target.type === 'checkbox' ? e.target.checked : e.target.value
 }
 
-export type TODO = any // TODO remove
+export type TODO = any // tslint:disable-line:no-any TODO remove
 
 type Decorator<OwnProps, EnhancedProps> = (someComponent: ComponentType<EnhancedProps>) => ComponentType<OwnProps>
 
@@ -49,7 +49,7 @@ export type FormProps<FormModel> = {
     controlFor: { [K in keyof FormModel]: ControlEnhancer<ControlProps<FormModel[K]>> },
     hasValidationErrors: boolean,
     ifValid: (callback: (formModel: FormModel) => void) => void,
-    setValues: (newValues: Partial<FormModel>) => void,
+    // setValues: (newValues: Partial<FormModel>) => void, TODO
     submit: EventHandler<FormEvent<HTMLFormElement>> & MouseEventHandler<{}>,
     validationErrors: FlatValidationResult<FormModel>,
     values: FormModel,
@@ -70,25 +70,31 @@ type Config<FM, OP> = {
 
 export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorator<OP, OP & FormProps<FM>> =>
   (WrappedComponent: ComponentType<OP & FormProps<FM>>): ComponentType<OP> => {
-    type FormWrapperState<FM> = { fieldMeta: FieldsMeta<FM>, values: FM }
+    type FormWrapperState = { fieldMeta: FieldsMeta<FM>, values: FM }
 
-    return class FormWrappedComponent extends Component<OP, FormWrapperState<FM>> {
-      private cachedEventHandlers: Partial<ByFormKey<FM, { onBlur: TODO, onChange: (value: TODO) => void }>> = {}
+    return class FormWrappedComponent extends Component<OP, FormWrapperState> {
+      static displayName = `withForm(${WrappedComponent.displayName || WrappedComponent.name})`
+      cachedEventHandlers: Partial<ByFormKey<FM, { onBlur: TODO, onChange: (value: TODO) => void }>> = {}
+      controlProxy = new Proxy<{ [K in keyof FM]: ControlEnhancer<ControlProps<FM[K]>> }>(
+        {} as { [K in keyof FM]: ControlEnhancer<ControlProps<FM[K]>> },
+        { get: (_, name: keyof FM) => this.controlFor(name) },
+      )
 
       constructor(props: OP) {
         super(props)
         const values: FM = config.initialValues(props)
         const initialValidator: FlatValidator<FM> = (config.validator && config.validator(props)(values)) || {}
-        const initialValidationResult: FlatValidationResult<FM> = validate(initialValidator, values);
-        const fieldMeta = mapValues<FM, FieldMeta>(values, <K extends keyof FM>(value: FM[K], fieldName: TODO /*K*/): FieldMeta => ({
-          errors: (initialValidationResult as TODO)[fieldName] as ValueValidationResult || [],
-          hasBlurred: false,
-        } as TODO)) as TODO
+        const initialValidationResult: FlatValidationResult<FM> = validate(initialValidator, values)
+        const fieldMeta = mapValues<FM, FieldMeta>(
+          values,
+          <K extends keyof FM>(value: FM[K], fieldName: TODO /*K*/): FieldMeta => ({
+            errors: (initialValidationResult as TODO)[fieldName] as ValueValidationResult || [],
+            hasBlurred: false,
+          } as TODO),
+        ) as TODO
 
         this.state = {fieldMeta, values}
       }
-
-      static displayName = `withForm(${WrappedComponent.displayName || WrappedComponent.name})`
 
       validationErrors = (fieldMeta: FieldsMeta<FM>): FlatValidationResult<FM> =>
         pickBy(
@@ -114,7 +120,6 @@ export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorat
           }))
         }
       }
-
 
       onSubmit = (event: FormEvent<HTMLFormElement> & MouseEvent<{}>): void => {
         event.preventDefault()
@@ -176,11 +181,6 @@ export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorat
         }
       }
 
-      controlProxy = new Proxy<{ [K in keyof FM]: ControlEnhancer<ControlProps<FM[K]>> }>(
-        {} as { [K in keyof FM]: ControlEnhancer<ControlProps<FM[K]>> },
-        { get: (_, name: keyof FM) => this.controlFor(name) },
-      )
-
       render(): ReactElement<OP & FormProps<FM>> {
         const hasUserVisibleValidationErrors = some(
           this.state.fieldMeta as object,
@@ -189,10 +189,10 @@ export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorat
 
         const formProps: FormProps<FM> = {
           form: {
-            controlFor: this.controlProxy as any,
+            controlFor: this.controlProxy as TODO,
             hasValidationErrors: hasUserVisibleValidationErrors,
             ifValid: this.ifValid,
-            setValues: (values: Partial<FM>) => console.log(values), // TODO
+            // setValues: (values: Partial<FM>) => console.log(values), // TODO
             submit: this.onSubmit,
             validationErrors: this.validationErrors(this.state.fieldMeta),
             values: this.state.values,

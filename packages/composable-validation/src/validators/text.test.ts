@@ -31,7 +31,6 @@ describe('textValidators', () => {
     })
   })
 
-
   describe('validEmail', () => {
     it('returns error for invalid email', () => {
       const invalidEmailErrors = validEmail('Example Text Here')
