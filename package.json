@@ -1,9 +1,20 @@
 {
-	"devDependencies": {
-		"lerna": "^2.0.0"
-	},
   "license": "MIT",
+  "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap"
-  }
+    "bootstrap": "lerna bootstrap",
+    "build:docs": "rm -rf ./docs && cd packages/with-form/example && yarn && rm -rf ./node_modules/with-notification-system/node_modules/react && yarn build && cp -r ./build ../../../docs",
+    "clean": "rimraf packages/**/dist",
+    "lint": "tslint packages/composable-validation/src/**/*.ts packages/with-form/src/**/*.ts",
+    "test": "lerna run test"
+  },
+  "dependencies": {
+    "lerna": "^2.2.0",
+    "rimraf": "^2.6.2",
+    "typescript": "^2.6.1",
+    "tslint": "^5.8.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

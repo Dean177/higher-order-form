@@ -1,13 +1,13 @@
 {
   "dependencies": {
-    "@types/lodash": "4.14.71",
-    "lodash": "4.17.4"
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "@types/jest": "20.0.5",
-    "jest": "20.0.4",
-    "ts-jest": "20.0.7",
-    "typescript": "2.4.2"
+    "@types/jest": "21.1.5",
+    "@types/lodash": "^4.14.81",
+    "jest": "21.2.1",
+    "ts-jest": "21.1.4",
+    "typescript": "2.6.1"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -43,11 +43,11 @@
   "name": "composable-validation",
   "scripts": {
     "build": "rm -rf dist && tsc",
-    "build:dev": "tsc --noEmit --pretty --watch",
+    "build:dev": "tsc -p tsconfig.build.json --pretty --watch",
     "dev": "concurrently -n \"make,test\" \"npm run build:dev\" \"npm run test:dev\"",
     "test:dev": "jest --watch",
     "test": "jest --coverage",
     "prepublish": "npm run test && npm run build"
   },
-  "version": "0.0.9"
+  "version": "0.1.0"
 }

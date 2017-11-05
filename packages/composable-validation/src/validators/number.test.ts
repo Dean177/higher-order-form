@@ -1,7 +1,7 @@
 import {
   maxValue,
   minValue,
-} from './numberValidators'
+} from './number'
 
 describe('numberValidators', () => {
   describe('maxValue', () => {

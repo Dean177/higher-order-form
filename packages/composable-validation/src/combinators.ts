@@ -1,33 +1,36 @@
 import { flatMap } from 'lodash';
-import { FlatValidator, FlatValidatorFn, validate, Validator, ValueValidator } from './validate'
+import { valid, ValueValidator } from './validate'
 
-// TODO remove the casts, the FlatValidatorFn type
-export const onlyIf =
-  <T>(condition: boolean | ((val: T) => boolean), validator: Validator<T>): FlatValidatorFn<T> => (value: T) => {
-    const returnValidationErrors = typeof condition === 'function' ? condition(value) : condition
-    return returnValidationErrors ? validate(validator as FlatValidator<T>, value) : []
-  }
+export function onlyIf<T>(condition: boolean | ((val: T) => boolean), validator: ValueValidator<T>): ValueValidator<T> {
+  return ((value: T) => {
+    const shouldReturnValidationErrors = typeof condition === 'function' ? condition(value) : condition
+    return shouldReturnValidationErrors
+      ? validator(value)
+      : valid
+  })
+}
 
-// TODO remove the casts, the FlatValidatorFn type
 export const requiredWithMessage = (message: string) =>
-  <T>(validator: Validator<T>): FlatValidatorFn<T | null | undefined> => (val: T | null | undefined) => {
-    if ((val == null) || (typeof val === 'string' && val.length === 0)) {
-      return [message]
+  <T>(validator: ValueValidator<T> | undefined): ValueValidator<T | null | undefined> =>
+    (val: T | null | undefined) => {
+      if ((val == null) || (typeof val === 'string' && val.length === 0)) {
+        return [message]
+      }
+
+      return validator ? validator(val) : valid
     }
 
-    return validate(validator as FlatValidator<T>, val)
-  }
-
-export const required: Validator<any> = // tslint:disable-line:no-any
+export const required: <T>(validator: ValueValidator<T> | undefined) => ValueValidator<T | null | undefined> =
   requiredWithMessage('Please complete this field')
 
-export const optional = <T>(validator: Validator<T>): FlatValidatorFn<T | null | undefined> =>
+
+export const optional = <T>(validator: ValueValidator<T>): ValueValidator<T | null | undefined> =>
   (val: T | null | undefined) => {
     if (val == null) {
       return []
     }
 
-    return validate(validator as FlatValidator<T>, val)
+    return validator(val)
   }
 
 export const rules = <T>(...validators: Array<ValueValidator<T>>): ValueValidator<T> =>
