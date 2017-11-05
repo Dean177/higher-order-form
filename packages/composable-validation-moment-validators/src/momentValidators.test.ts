@@ -3,7 +3,7 @@ import {
   timeStampBefore,
   timeStampInFuture, dateOnOrBeforeToday, validDateRange, dateInPast, dateSameOrBefore, timeStampInPast,
   datesOnOrBeforeToday, maxLengthInDays, maxLengthInMonths,
-} from './dateValidators'
+} from './momentValidators'
 import * as moment from 'moment'
 import { today, tomorrow, yesterday } from '../models/DateStamp'
 

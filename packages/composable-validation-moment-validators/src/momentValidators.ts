@@ -1,5 +1,5 @@
-import { ValueValidator } from '../validate'
 import * as moment from 'moment-timezone'
+import { ValueValidator } from '../validate'
 import {
   DateRange,
   DateStamp,
