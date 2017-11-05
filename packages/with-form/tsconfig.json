@@ -1,23 +1,14 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "declaration": true,
-    "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "lib": ["dom", "es6"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noEmitOnError": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
     "outDir": "dist",
-    "rootDir": "src",
-    "sourceMap": false,
-    "strict": true,
-    "target": "es5"
+    "rootDir": "src"
   },
   "exclude": [
     "dist",
+    "example",
     "node_modules",
     "**/*.test.tsx"
   ]

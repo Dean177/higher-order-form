@@ -4,8 +4,13 @@ A [higher-order-component](https://facebook.github.io/react/docs/higher-order-co
  
 ## Installation
 
-`yarn add with-form`
+`yarn add composable-validation with-form`
 
 ## Usage
 
 Coming soon
+
+## Motivation
+Simple two way binding - example ?
+Typesafe - example ?
+Declarative validation - via composable-validation ?

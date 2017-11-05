@@ -1,4 +1,6 @@
 coverage
+docs
+example
 node_modules
 yarn-error.log
 yarn.lock

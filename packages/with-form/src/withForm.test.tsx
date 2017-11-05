@@ -1,15 +1,16 @@
 import { shallow } from 'enzyme'
 import { noop } from 'lodash'
 import * as React from 'react'
-import { withForm, Form } from './withForm'
+import { withForm, FormProps } from './withForm'
+import { unwrapParentheses } from 'tslint'
 
 type FormModel = { field: number, otherField: string }
 type FormOwnProps = { someProp: number }
-type MockFormProps = FormOwnProps & Form<FormModel>
-const MockForm = (props: MockFormProps) =>
+type MockFormProps = FormOwnProps & FormProps<FormModel>
+const MockForm: React.ComponentType<MockFormProps> = (props) =>
   <form onSubmit={props.form.submit}>
-    {props.form.controlFor('field')(<input />)}
-    {props.form.controlFor('otherField')(<input />)}
+    {props.form.controlFor.field(<input />)}
+    {props.form.controlFor.otherField(<input />)}
   </form>
 
 const mockSubmissionEvent = { preventDefault: noop }
@@ -17,9 +18,9 @@ const mockSubmissionEvent = { preventDefault: noop }
 describe('withForm', () => {
   const initialValues: FormModel = { field: 0, otherField: '' }
   const handleSubmission = jest.fn()
-  const formCreator = withForm<FormModel, FormOwnProps>({
+  const formCreator = withForm<FormOwnProps, FormModel>({
     initialValues: (props: FormOwnProps) => initialValues,
-    validator: (state: FormModel, props: FormOwnProps) => ({field: () => []}),
+    validator: (props: FormOwnProps) => () => (state: FormModel) => ({ field: () => [] }),
     onSubmit: (props: FormOwnProps) => handleSubmission,
   })
 
@@ -27,22 +28,15 @@ describe('withForm', () => {
     expect(typeof formCreator).toBe('function')
   })
 
-  // TODO
-  // it('should render without error', () => {
-  //   const WrappedMockForm = formCreator(MockForm)
-  //   expect(<WrappedMockForm someProp={4} />).toRenderWithoutError()
-  // })
-
-  describe('withForm parameters', () => {
+  describe('withForm config', () => {
     const ownProps = { someProp: 5 }
     const initialValueSpy = jest.fn((props: FormOwnProps) => initialValues)
-    const validatorSpy = jest.fn(((state: FormModel, props: FormOwnProps) =>
-      ({ field: (fieldValue: number): Array<string> => [] })
-    ))
+    const validatorSpy = jest.fn((state: FormModel) =>({ field: (fieldValue: number): Array<string> => [] }))
+    const getValidatorSpy = jest.fn((props: FormOwnProps) => validatorSpy)
     const submitSpy = jest.fn((props: FormOwnProps) => noop)
-    const ParamSpyForm = withForm({
+    const ParamSpyForm: React.ComponentType<FormOwnProps> = withForm<FormOwnProps, FormModel>({
       initialValues: initialValueSpy,
-      validator: validatorSpy,
+      validator: getValidatorSpy,
       onSubmit: submitSpy,
     })(MockForm)
     const renderedForm = shallow(<ParamSpyForm someProp={ownProps.someProp} />)
@@ -56,7 +50,8 @@ describe('withForm', () => {
     describe('validator', () => {
       it('passes the components props and form state to allow the validation rules to be dynamically set', () => {
         renderedForm.props().form.submit(mockSubmissionEvent)
-        expect(validatorSpy).toHaveBeenCalledWith(initialValues, ownProps)
+        expect(getValidatorSpy).toHaveBeenCalledWith(ownProps)
+        expect(validatorSpy).toHaveBeenCalledWith(initialValues)
       })
     })
 
@@ -68,7 +63,7 @@ describe('withForm', () => {
     })
   })
 
-  describe('form prop', () => {
+  describe('form props', () => {
     it('passes though all props and provides a form prop to the wrapped component', () => {
       const WrappedMockForm = formCreator(MockForm)
       const wrappedForm = shallow(<WrappedMockForm someProp={5} />)
@@ -81,23 +76,23 @@ describe('withForm', () => {
       const WrappedMockForm = formCreator(MockForm)
       const wrappedForm = shallow(<WrappedMockForm someProp={5} />)
       const props = wrappedForm.props()
-      expect(props.form.fieldValues).toBeDefined()
-      expect(props.form.fieldValues).toBe(initialValues)
+      expect(props.form.values).toBeDefined()
+      expect(props.form.values).toBe(initialValues)
     })
 
     describe('controlFor', () => {
-      it.skip('links the value and onChange of a control to the form state')
-      it.skip('provides hasError & onBlur props to the control')
+      it.skip('links the value and onChange of a control to the form state') // TODO
+      it.skip('provides an onBlur prop to the control') // TODO
     })
 
     describe('submit', () => {
       const getInitialValues = (props: FormOwnProps) => initialValues
 
       it('will not submit if there are validation errors', () => {
-        const getErrorValidator = (state: FormModel, props: FormOwnProps) =>
+        const getErrorValidator = (props: FormOwnProps) => (state: FormModel) =>
           ({ field: (fieldValue: number) => ['Errors'] })
         const submitSpy = jest.fn()
-        const AlwaysErrorForm = withForm<FormModel, FormOwnProps>({
+        const AlwaysErrorForm = withForm<FormOwnProps, FormModel>({
           initialValues: getInitialValues,
           validator: getErrorValidator,
           onSubmit: () => submitSpy,
@@ -111,21 +106,22 @@ describe('withForm', () => {
 
       it('displays validation errors if they are present and the form is submitted', () => {
         const validationErrors = ['Errors']
-        const getErrorValidator = (state: FormModel, props: FormOwnProps) =>
-          ({ field: (fieldValue: number) => validationErrors })
-        const AlwaysErrorForm = withForm<FormModel, FormOwnProps>({
+        const AlwaysErrorForm = withForm<FormOwnProps, FormModel>({
           initialValues: getInitialValues,
-          validator: getErrorValidator,
+          validator: (props: FormOwnProps) => (state: FormModel) => ({
+            field: (fieldValue: number) => validationErrors
+          }),
           onSubmit: () => noop,
         })(MockForm)
         const renderedForm = shallow(<AlwaysErrorForm someProp={5} />)
 
         renderedForm.props().form.submit(mockSubmissionEvent)
-        expect(renderedForm.props().form.validationErrors().field).toBe(validationErrors)
+        renderedForm.update()
+        expect(renderedForm.props().form.validationErrors.field).toBe(validationErrors)
       })
 
-      it('saves if there are no validation errors', () => {
-        const getNeverErrorValidator = (state: FormModel, props: FormOwnProps) =>
+      it('will call onSubmit if there are no validation errors', () => {
+        const getNeverErrorValidator = (props: FormOwnProps) => (state: FormModel) =>
           ({ field: (fieldValue: number) => [] })
         const submitSpy = jest.fn()
         const AlwaysErrorForm = withForm({
