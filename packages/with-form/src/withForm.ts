@@ -65,7 +65,7 @@ type FieldsMeta<FM> = ByFormKey<FM, FieldMeta>
 type Config<FM, OP> = {
   initialValues: (ownProps: OP) => FM,
   validator?: (ownProps: OP) => (formState: FM) => FlatValidator<FM>,
-  onSubmit: (ownProps: OP) => (formModel: FM) => void,
+  onSubmit: (ownProps: OP) => (formModel: FM) => any,
 }
 
 export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorator<OP, OP & FormProps<FM>> =>
