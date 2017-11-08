@@ -2,7 +2,6 @@ import { shallow } from 'enzyme'
 import { noop } from 'lodash'
 import * as React from 'react'
 import { withForm, FormProps } from './withForm'
-import { unwrapParentheses } from 'tslint'
 
 type FormModel = { field: number, otherField: string }
 type FormOwnProps = { someProp: number }
