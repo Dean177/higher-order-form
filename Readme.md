@@ -1,14 +1,18 @@
 # higher-order-form
 
-The packages in this repository are managed with [lerna](https://github.com/lerna/lerna)
+[![CircleCI](https://circleci.com/gh/Dean177/with-notification-system.svg?style=shield)](https://circleci.com/gh/Dean177/higher-order-form)
+[![Greenkeeper badge](https://badges.greenkeeper.io/Dean177/higher-order-form.svg)](https://greenkeeper.io/)
 
-Each package contains its own readme
+The packages in this repository are managed with [lerna](https://github.com/lerna/lerna) and [yarn workspaces](https://yarnpkg.com/en/docs/workspaces)
 
 ## Development
 
-In the repository root run 
-`yarn && yarn bootstrap`
-or if you are using npm
-`npm install && npm run bootstrap`
+In the repository root run `yarn && yarn bootstrap`
 
-Then follow any steps detailed in each packages readme.
+## Packages
+
+- [composable-validation](./packages/composable-validation)
+[![Npm](https://badge.fury.io/js/composable-validation.svg)](https://www.npmjs.com/package/composable-validation)
+
+- [with-form](./packages/with-form)
+[![Npm](https://badge.fury.io/js/with-form.svg)](https://www.npmjs.com/package/with-formm)

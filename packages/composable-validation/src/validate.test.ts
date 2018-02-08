@@ -1,4 +1,4 @@
-import { validate, ValueValidator, Validator, hasValidationErrors, identityValidator } from './validate'
+import { validate, ValueValidator, Validator, hasValidationErrors, NestedValidator } from './validate'
 
 export const maxLength = (max: number): ValueValidator<string | null> =>
   (value: string | null) => (value != null && value.length > max) ? [`Text must be less than ${max} characters`] : []
@@ -30,13 +30,13 @@ describe('validate', () => {
         postcode: string,
       },
     }
-    const constraints: Validator<TestObject> = {
+    const constraints: NestedValidator<TestObject> = {
       name: maxLength(10),
       address: {
         postcode: minLength(5),
       },
     }
-    const result = validate(constraints, { name: '', address: { postcode: '' } })
+    const result = validate(constraints, { name: '', address: { postcode: '' } } as TestObject)
 
     expect(result.name).toBeUndefined()
     expect(result.address.postcode.length).toBeGreaterThan(0)

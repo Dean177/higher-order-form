@@ -1,0 +1,82 @@
+.App {
+  flex-direction: column;
+}
+.App .content {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.App .content .status-icons {
+  align-self: center;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.App .content .status-icons .status-icon {
+  margin-left: 10px;
+}
+
+.App-header {
+  background-color: #222;
+  color: white;
+  font-size: large;
+  padding: 20px;
+  text-align: center;
+}
+
+.ErrorBoundary {
+  padding: 20px;
+}
+
+.ButtonGroup {
+  margin-bottom: 20px;
+}
+.ButtonGroup button {
+  margin-right: 10px;
+}
+
+.CodeMirror {
+  height: auto;
+}
+
+.FormExample {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+.FormExample form {
+  border: 1px solid grey;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 20px;
+}
+.FormExample form label {
+  margin-top: 10px;
+  padding-bottom: 3px;
+}
+.FormExample form input {
+  padding: 5px 3px;
+}
+.FormExample form button {
+  margin-top: 10px;
+  padding: 5px 3px;
+}
+
+.FormExample .state {
+  border: 1px solid grey;
+  border-left: none;
+  flex: 1;
+  flex-direction: column;
+  padding: 20px;
+}
+.FormExample .state pre {
+  background-color: bisque;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding: 20px;
+}

@@ -1,10 +1,23 @@
 {
-  "devDependencies": {
-    "lerna": "^2.0.0"
-  },
   "license": "MIT",
+  "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "publish-packages": "lerna publish"
+    "build:docs": "rm -rf ./docs && cd packages/with-form-documentation && yarn && yarn build && mv ./build ../../docs",
+    "clean": "rimraf packages/**/dist docs",
+    "lint": "tslint packages/*/src/**/*.ts packages/*/src/**/*.tsx",
+    "test": "lerna run test"
+  },
+  "dependencies": {
+    "lerna": "^2.2.0",
+    "rimraf": "^2.6.2",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.1"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "tslint-react": "3.2.0"
   }
 }
