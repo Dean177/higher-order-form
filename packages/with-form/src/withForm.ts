@@ -20,9 +20,20 @@ import {
   ValueValidationResult,
 } from 'composable-validation'
 
+export const finallyPromise = <T>(promise: Promise<T>, postPromiseAction: () => void): Promise <T> =>
+  promise
+    .then(t => {
+      postPromiseAction()
+      return t
+    })
+    .catch(e => {
+      postPromiseAction()
+      throw e
+    })
+
 export function getValueFromEvent<I, O>(e: I): O
 export function getValueFromEvent(e: any): any { // tslint:disable-line:no-any
-  // support elements which just return their value
+                                                 // support elements which just return their value
   if (!e || !e.target) {
     return e
   }
@@ -39,17 +50,22 @@ export type ControlEnhancer<Props> = (element: ReactElement<Props>) => ReactElem
 export type ByFormKey<FormModel, T> = { [K in keyof FormModel]: T }
 
 export type ControlProps<ValueType> = {
+  disabled?: boolean,
   onBlur?: (event?: TODO) => void,
   onChange?: (value: ValueType) => void,
   value?: ValueType,
 }
 
+export type FormManipulator<FormModel> = {
+  resetForm: () => void,
+  setValues: (newValues: Partial<FormModel>) => void,
+}
+
 export type FormProps<FormModel> = {
-  form: {
+  form: FormManipulator<FormModel> & {
     controlFor: { [K in keyof FormModel]: ControlEnhancer<ControlProps<FormModel[K]>> },
     hasValidationErrors: boolean,
-    ifValid: (callback: (formModel: FormModel) => void) => void,
-    // setValues: (newValues: Partial<FormModel>) => void, TODO
+    isSubmitting: boolean,
     submit: EventHandler<FormEvent<HTMLFormElement>> & MouseEventHandler<{}>,
     validationErrors: FlatValidationResult<FormModel>,
     values: FormModel,
@@ -60,17 +76,32 @@ type FieldMeta = {
   errors: ValueValidationResult
   hasBlurred: boolean,
 }
+
 type FieldsMeta<FM> = ByFormKey<FM, FieldMeta>
+
+const mapToFieldMeta = <FM extends {}>(flatObject: FM, validationResult: FlatValidationResult<FM>): FieldsMeta<FM> =>
+  mapValues<FM, FieldMeta>(
+    flatObject,
+    <K extends keyof FM>(value: FM[K], fieldName: TODO /*K*/): FieldMeta => ({
+      errors: (validationResult as TODO)[fieldName] as ValueValidationResult || [],
+      hasBlurred: false,
+    } as TODO),
+  ) as TODO
+
 
 type Config<FM, OP> = {
   initialValues: (ownProps: OP) => FM,
   validator?: (ownProps: OP) => (formState: FM) => FlatValidator<FM>,
-  onSubmit: (ownProps: OP) => (formModel: FM) => void,
+  onSubmit: (ownProps: OP) => (formModel: FM, formManipulator: FormManipulator<FM>) => Promise<any> | void,
 }
 
 export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorator<OP, OP & FormProps<FM>> =>
   (WrappedComponent: ComponentType<OP & FormProps<FM>>): ComponentType<OP> => {
-    type FormWrapperState = { fieldMeta: FieldsMeta<FM>, values: FM }
+    type FormWrapperState = {
+      fieldMeta: FieldsMeta<FM>,
+      isSubmitting: boolean,
+      values: FM,
+    }
 
     return class FormWrappedComponent extends Component<OP, FormWrapperState> {
       static displayName = `withForm(${WrappedComponent.displayName || WrappedComponent.name})`
@@ -83,17 +114,17 @@ export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorat
       constructor(props: OP) {
         super(props)
         const values: FM = config.initialValues(props)
-        const initialValidator: FlatValidator<FM> = (config.validator && config.validator(props)(values)) || {}
+        const initialValidator: FlatValidator<FM> = config.validator != null
+          ? config.validator(props)(values)
+          : {} as FlatValidator<FM>
         const initialValidationResult: FlatValidationResult<FM> = validate(initialValidator, values)
-        const fieldMeta = mapValues<FM, FieldMeta>(
-          values,
-          <K extends keyof FM>(value: FM[K], fieldName: TODO /*K*/): FieldMeta => ({
-            errors: (initialValidationResult as TODO)[fieldName] as ValueValidationResult || [],
-            hasBlurred: false,
-          } as TODO),
-        ) as TODO
+        const fieldMeta = mapToFieldMeta(values, initialValidationResult)
 
-        this.state = {fieldMeta, values}
+        this.state = {
+          isSubmitting: false,
+          fieldMeta,
+          values,
+        }
       }
 
       validationErrors = (fieldMeta: FieldsMeta<FM>): FlatValidationResult<FM> =>
@@ -106,24 +137,34 @@ export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorat
           (errors) => errors && errors.length > 0
         )
 
-      ifValid = (callbackIfValid: (formModel: FM) => void): void => {
+      isValid = (): boolean => {
         const validator: Validator<FM> | undefined = config.validator && config.validator(this.props)(this.state.values)
-        const validationResult = validate((validator || {}) as TODO, this.state.values)
-        if (!hasValidationErrors(validationResult)) {
-          callbackIfValid(this.state.values)
-        } else {
+        const validationResult = validate((validator || {}), this.state.values)
+        return !hasValidationErrors(validationResult)
+      }
+
+      onSubmit = (event: FormEvent<HTMLFormElement> & MouseEvent<{}>) => {
+        event.preventDefault()
+        if (!this.isValid()) {
           // Mark all fields as blurred so that validation errors are shown
-          this.setState((currentState) => ({
-            fieldMeta: mapValues<FieldsMeta<FM>>(currentState.fieldMeta, ({errors}: FieldMeta): FieldMeta =>
-              ({errors, hasBlurred: true})),
+          return this.setState((currentState) => ({
+            fieldMeta: mapValues<FieldsMeta<FM>>(currentState.fieldMeta, ({ errors }: FieldMeta): FieldMeta =>
+              ({ errors, hasBlurred: true })),
             values: currentState.values,
           }))
         }
-      }
 
-      onSubmit = (event: FormEvent<HTMLFormElement> & MouseEvent<{}>): void => {
-        event.preventDefault()
-        this.ifValid(config.onSubmit(this.props))
+        const submissionResult: Promise<void> | void = config.onSubmit(this.props)(this.state.values, {
+          resetForm: this.resetForm,
+          setValues: this.setValues,
+        })
+
+        if (submissionResult == null || submissionResult.then == null) {
+          return
+        }
+
+        this.setState({ isSubmitting: true })
+        return finallyPromise(submissionResult, () => this.setState({ isSubmitting: false }))
       }
 
       controlFor = (fieldName: keyof FM): ControlEnhancer<ControlProps<FM[keyof FM]>> => {
@@ -132,30 +173,12 @@ export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorat
             // Typescript complains when using object spread on a generic type, use assign to work around.
             onBlur: (): TODO => this.setState(currentState => ({
               fieldMeta: Object.assign({}, currentState.fieldMeta, {
-                [fieldName]: Object.assign({}, currentState.fieldMeta[fieldName], {hasBlurred: true}),
+                [fieldName]: Object.assign({}, currentState.fieldMeta[fieldName], { hasBlurred: true }),
               }),
               values: currentState.values,
             })),
-            onChange: (event: TODO): TODO => {
-              const newValue = getValueFromEvent(event)
-              this.setState(currentState => {
-                const nextValues = Object.assign({}, currentState.values, {[fieldName]: newValue})
-                const validatorInstance: Validator<FM> | undefined =
-                  config.validator && config.validator(this.props)(nextValues)
-                const validationResult: TODO = validate((validatorInstance || {}) as TODO, nextValues)
-                const nextFieldMeta = mapValues(
-                  currentState.fieldMeta,
-                  (currentFieldMeta, keyFieldName: keyof FM) => Object.assign({}, currentFieldMeta, {
-                    errors: validationResult[keyFieldName],
-                  }),
-                )
-
-                return {
-                  fieldMeta: nextFieldMeta,
-                  values: nextValues,
-                }
-              })
-            },
+            onChange: (event: TODO): void =>
+              this.setValues({ [fieldName]: getValueFromEvent(event) } as Partial<FM>),
           }
         }
 
@@ -165,7 +188,7 @@ export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorat
         })
 
         return (control: ReactElement<ControlProps<FM[keyof FM]>>): ReactElement<ControlProps<FM[keyof FM]>> => {
-          const {onChange: existingOnChange, ...existingProps} = control.props
+          const { onChange: existingOnChange, ...existingProps } = control.props
           const newOnChange = existingOnChange == null
             ? props.onChange
             : (fieldValue: FM[keyof FM]) => {
@@ -175,11 +198,42 @@ export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorat
               }
             }
 
-          const enhancedProps: ControlProps<FM[keyof FM]> = {...existingProps, ...props, onChange: newOnChange}
+          const enhancedProps: ControlProps<FM[keyof FM]> = { ...existingProps, ...props, onChange: newOnChange }
 
           return cloneElement<ControlProps<FM[keyof FM]>, ControlProps<FM[keyof FM]>>(control, enhancedProps)
         }
       }
+
+      resetForm = () => {
+        const values: FM = config.initialValues(this.props)
+        const initialValidator: FlatValidator<FM> = config.validator != null
+          ? config.validator(this.props)(values)
+          : {} as FlatValidator<FM>
+
+        this.setState({
+          isSubmitting: false,
+          fieldMeta: mapToFieldMeta(values, validate(initialValidator, values)),
+          values,
+        })
+      }
+
+      setValues = (values: Partial<FM>) => this.setState(currentState => {
+        const nextValues = Object.assign({}, currentState.values, values)
+        const validatorInstance: Validator<FM> | undefined =
+          config.validator && config.validator(this.props)(nextValues)
+        const validationResult = validate((validatorInstance || {}), nextValues)
+        const nextFieldMeta = mapValues(
+          currentState.fieldMeta,
+          (currentFieldMeta, keyFieldName: keyof FM) => Object.assign({}, currentFieldMeta, {
+            errors: validationResult[keyFieldName],
+          }),
+        )
+
+        return {
+          fieldMeta: nextFieldMeta,
+          values: nextValues,
+        }
+      })
 
       render(): ReactElement<OP & FormProps<FM>> {
         const hasUserVisibleValidationErrors = some(
@@ -189,10 +243,11 @@ export const withForm = <OP, FM extends object>(config: Config<FM, OP>): Decorat
 
         const formProps: FormProps<FM> = {
           form: {
-            controlFor: this.controlProxy as TODO,
+            controlFor: this.controlProxy,
             hasValidationErrors: hasUserVisibleValidationErrors,
-            ifValid: this.ifValid,
-            // setValues: (values: Partial<FM>) => console.log(values), // TODO
+            isSubmitting: this.state.isSubmitting,
+            resetForm: this.resetForm,
+            setValues: this.setValues,
             submit: this.onSubmit,
             validationErrors: this.validationErrors(this.state.fieldMeta),
             values: this.state.values,

@@ -1,7 +1,7 @@
 {
   "author": "Dean Merchant",
   "name": "with-form",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "dependencies": {
     "composable-validation": "^0.2.0",
     "lodash": "^4.17.4"
@@ -56,11 +56,13 @@
     }
   },
   "license": "MIT",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "dist/withForm.js",
   "types": "dist/withForm.d.ts",
   "scripts": {
-    "build": "cross-env NODE_ENV=producttion rm -rf dist && tsc",
+    "build": "cross-env NODE_ENV=producttion rm -rf dist && tsc --pretty",
     "build:dev": "tsc --pretty --watch",
     "start": "concurrently -n \"make,test\" \"yarn build:dev\" \"yarn test:dev\"",
     "test": "jest --coverage",

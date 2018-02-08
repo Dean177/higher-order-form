@@ -1,11 +1,12 @@
 import { shallow } from 'enzyme'
 import { noop } from 'lodash'
 import * as React from 'react'
+import { identityValidator, FlatValidator, ValueValidationResult } from 'composable-validation'
 import { withForm, FormProps } from './withForm'
 
 type FormModel = { field: number, otherField: string }
-type FormOwnProps = { someProp: number }
-type MockFormProps = FormOwnProps & FormProps<FormModel>
+type MockOwnProps = { someProp: number }
+type MockFormProps = MockOwnProps & FormProps<FormModel>
 const MockForm: React.ComponentType<MockFormProps> = (props) => (
   <form onSubmit={props.form.submit}>
     {props.form.controlFor.field(<input />)}
@@ -17,10 +18,12 @@ const mockSubmissionEvent = { preventDefault: noop }
 describe('withForm', () => {
   const initialValues: FormModel = { field: 0, otherField: '' }
   const handleSubmission = jest.fn()
-  const formCreator = withForm<FormOwnProps, FormModel>({
-    initialValues: (props: FormOwnProps) => initialValues,
-    validator: (props: FormOwnProps) => () => (state: FormModel) => ({ field: () => [] }),
-    onSubmit: (props: FormOwnProps) => handleSubmission,
+  const formCreator = withForm<MockOwnProps, FormModel>({
+    initialValues: (props: MockOwnProps) => initialValues,
+    validator: (props: MockOwnProps) => (formState: FormModel): FlatValidator<FormModel> => ({
+      otherField: () => [],
+    }),
+    onSubmit: (props: MockOwnProps) => handleSubmission,
   })
 
   it('returns a function', () => {
@@ -29,11 +32,11 @@ describe('withForm', () => {
 
   describe('withForm config', () => {
     const ownProps = { someProp: 5 }
-    const initialValueSpy = jest.fn((props: FormOwnProps) => initialValues)
+    const initialValueSpy = jest.fn((props: MockOwnProps) => initialValues)
     const validatorSpy = jest.fn((state: FormModel) => ({ field: (fieldValue: number): Array<string> => [] }))
-    const getValidatorSpy = jest.fn((props: FormOwnProps) => validatorSpy)
-    const submitSpy = jest.fn((props: FormOwnProps) => noop)
-    const ParamSpyForm: React.ComponentType<FormOwnProps> = withForm<FormOwnProps, FormModel>({
+    const getValidatorSpy = jest.fn((props: MockOwnProps) => validatorSpy)
+    const submitSpy = jest.fn((props: MockOwnProps) => noop)
+    const ParamSpyForm: React.ComponentType<MockOwnProps> = withForm<MockOwnProps, FormModel>({
       initialValues: initialValueSpy,
       validator: getValidatorSpy,
       onSubmit: submitSpy,
@@ -85,13 +88,13 @@ describe('withForm', () => {
     })
 
     describe('submit', () => {
-      const getInitialValues = (props: FormOwnProps) => initialValues
+      const getInitialValues = (props: MockOwnProps) => initialValues
 
       it('will not submit if there are validation errors', () => {
-        const getErrorValidator = (props: FormOwnProps) => (state: FormModel) =>
+        const getErrorValidator = (props: MockOwnProps) => (state: FormModel) =>
           ({ field: (fieldValue: number) => ['Errors'] })
         const submitSpy = jest.fn()
-        const AlwaysErrorForm = withForm<FormOwnProps, FormModel>({
+        const AlwaysErrorForm = withForm<MockOwnProps, FormModel>({
           initialValues: getInitialValues,
           validator: getErrorValidator,
           onSubmit: () => submitSpy,
@@ -105,9 +108,9 @@ describe('withForm', () => {
 
       it('displays validation errors if they are present and the form is submitted', () => {
         const validationErrors = ['Errors']
-        const AlwaysErrorForm = withForm<FormOwnProps, FormModel>({
+        const AlwaysErrorForm = withForm<MockOwnProps, FormModel>({
           initialValues: getInitialValues,
-          validator: (props: FormOwnProps) => (state: FormModel) => ({
+          validator: (props: MockOwnProps) => (state: FormModel) => ({
             field: (fieldValue: number) => validationErrors
           }),
           onSubmit: () => noop,
@@ -120,7 +123,7 @@ describe('withForm', () => {
       })
 
       it('will call onSubmit if there are no validation errors', () => {
-        const getNeverErrorValidator = (props: FormOwnProps) => (state: FormModel) =>
+        const getNeverErrorValidator = (props: MockOwnProps) => (state: FormModel) =>
           ({ field: (fieldValue: number) => [] })
         const submitSpy = jest.fn()
         const AlwaysErrorForm = withForm({
@@ -129,10 +132,13 @@ describe('withForm', () => {
           onSubmit: () => submitSpy,
         })(MockForm)
         const renderedForm = shallow(<AlwaysErrorForm someProp={5} />)
+        const renderedProps = renderedForm.props()
+        renderedProps.form.submit(mockSubmissionEvent)
 
-        renderedForm.props().form.submit(mockSubmissionEvent)
-
-        expect(submitSpy).toHaveBeenCalledWith(initialValues)
+        expect(submitSpy).toHaveBeenCalledWith(
+          initialValues,
+          { resetForm: renderedProps.form.resetForm, setValues: renderedProps.form.setValues },
+        )
       })
     })
 
