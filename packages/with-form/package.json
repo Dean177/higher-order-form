@@ -1,7 +1,7 @@
 {
   "author": "Dean Merchant",
   "name": "with-form",
-  "version": "0.2.1",
+  "version": "0.3.1",
   "dependencies": {
     "composable-validation": "^0.2.0",
     "lodash": "^4.17.4"
@@ -15,8 +15,8 @@
     "@types/jest": "21.1.5",
     "@types/lodash": "4.14.81",
     "@types/prop-types": "15.5.2",
-    "@types/react": "16.0.20",
-    "@types/react-dom": "16.0.2",
+    "@types/react": "16.0.36",
+    "@types/react-dom": "16.0.3",
     "concurrently": "3.5.0",
     "cross-env": "5.1.1",
     "enzyme": "3.1.1",
@@ -56,11 +56,13 @@
     }
   },
   "license": "MIT",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "dist/withForm.js",
   "types": "dist/withForm.d.ts",
   "scripts": {
-    "build": "cross-env NODE_ENV=producttion rm -rf dist && tsc",
+    "build": "cross-env NODE_ENV=producttion rm -rf dist && tsc --pretty",
     "build:dev": "tsc --pretty --watch",
     "start": "concurrently -n \"make,test\" \"yarn build:dev\" \"yarn test:dev\"",
     "test": "jest --coverage",

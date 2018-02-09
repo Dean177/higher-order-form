@@ -90,3 +90,9 @@ describe('hasValidationErrors', () => {
   })
 })
 
+describe('identityValidator', () => {
+  it('always returns no errors for any value it is given', () => {
+    expect(identityValidator('value').length).toBe(0)
+  })
+})
+

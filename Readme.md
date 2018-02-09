@@ -1,6 +1,6 @@
 # higher-order-form
 
-[![CircleCI](https://circleci.com/gh/Dean177/with-notification-system.svg?style=svg)](https://circleci.com/gh/Dean177/higher-order-form)
+[![CircleCI](https://circleci.com/gh/Dean177/with-notification-system.svg?style=shield)](https://circleci.com/gh/Dean177/higher-order-form)
 [![Greenkeeper badge](https://badges.greenkeeper.io/Dean177/higher-order-form.svg)](https://greenkeeper.io/)
 
 The packages in this repository are managed with [lerna](https://github.com/lerna/lerna) and [yarn workspaces](https://yarnpkg.com/en/docs/workspaces)
