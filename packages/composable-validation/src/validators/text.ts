@@ -6,6 +6,9 @@ export const maxLength = (max: number): ValueValidator<string> =>
 export const minLength = (min: number): ValueValidator<string> =>
   (value: string) => value.length < min ? [`Must be at least ${min} characters`] : valid
 
+export const trimmed = (validator: ValueValidator<string>): ValueValidator<string> =>
+    (value: string) => validator(value.trim())
+
 export const validEmail: ValueValidator<string> = (email: string) => {
   const parts = email.split('@')
   const [before, after] = parts

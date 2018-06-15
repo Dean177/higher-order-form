@@ -2,6 +2,7 @@ import {
   maxLength,
   minLength,
   validEmail,
+  trimmed,
 } from './text'
 
 describe('textValidators', () => {
@@ -42,6 +43,18 @@ describe('textValidators', () => {
       expect(minLength(3)('123').length).toBe(0)
       expect(minLength(3)('1234').length).toBe(0)
     })
+  })
+
+  describe('trimmed', () => {
+    describe('when used with minLength', () => {
+      it('returns error if string right length but all whitespace', () => {
+        expect(trimmed(minLength(3))('   ').length).toBeGreaterThan(0)
+      })
+
+      it('returns error if string right length but with initial or trailing whitespace', () => {
+        expect(trimmed(minLength(3))(' 12').length).toBeGreaterThan(0)
+        expect(trimmed(minLength(3))('12 ').length).toBeGreaterThan(0)
+      })
   })
 
   describe('validEmail', () => {
