@@ -42,6 +42,15 @@ describe('textValidators', () => {
       expect(minLength(3)('123').length).toBe(0)
       expect(minLength(3)('1234').length).toBe(0)
     })
+
+    it('returns error if string right length but all whitespace', () => {
+        expect(minLength(3)('   ').length).toBeGreaterThan(0)
+    })
+
+    it('returns error if string right length but with initial or trailing whitespace', () => {
+        expect(minLength(3)(' 12').length).toBeGreaterThan(0)
+        expect(minLength(3)('12 ').length).toBeGreaterThan(0)
+    })
   })
 
   describe('validEmail', () => {

@@ -4,7 +4,7 @@ export const maxLength = (max: number): ValueValidator<string> =>
   (value: string) => value.length > max ? [`Must be less than ${max} characters`] : valid
 
 export const minLength = (min: number): ValueValidator<string> =>
-  (value: string) => value.length < min ? [`Must be at least ${min} characters`] : valid
+  (value: string) => value.trim().length < min ? [`Must be at least ${min} characters`] : valid
 
 export const validEmail: ValueValidator<string> = (email: string) => {
   const parts = email.split('@')
