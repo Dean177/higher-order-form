@@ -49,5 +49,10 @@
     "test": "jest --coverage",
     "prepublish": "npm run test && npm run build"
   },
-  "version": "0.2.0"
+  "version": "0.2.0",
+  "contributors": [{
+      "name" : "David Giles",
+      "url" : "https://github.com/DavidGiles"
+    }
+  ]
 }
