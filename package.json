@@ -9,15 +9,15 @@
     "test": "lerna run test"
   },
   "dependencies": {
-    "lerna": "^2.2.0",
+    "lerna": "^3.4.1",
     "rimraf": "^2.6.2",
     "tslint": "^5.8.0",
-    "typescript": "^2.6.1"
+    "typescript": "^3.1.1"
   },
   "workspaces": [
     "packages/*"
   ],
   "devDependencies": {
-    "tslint-react": "3.2.0"
+    "tslint-react": "3.6.0"
   }
 }
