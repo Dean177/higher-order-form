@@ -1,0 +1,12 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "package.json",
+        "packages/composable-validation/package.json",
+        "packages/with-form-documentation/package.json",
+        "packages/with-form/package.json"
+      ]
+    }
+  }
+}
